@@ -1,0 +1,49 @@
+name: CI
+
+# Runs on a self-hosted runner on the maintainer's Mac (labels: self-hosted, macOS).
+# This repository is public, and a self-hosted runner executes whatever a
+# workflow run asks it to — including workflows edited inside a pull request.
+# The repository therefore requires manual approval before any workflow run
+# from an outside contributor (Settings → Actions → General → "Require approval
+# for all external contributors"). Review pull requests that touch .github/
+# before approving them.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build (${{ matrix.configuration }})
+    runs-on: [self-hosted, macOS]
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # Release is what TestFlight ships; Debug includes the DEBUG-only code.
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # A private DerivedData per job: sharing the default one with an open
+      # Xcode session corrupts its build database.
+      - name: Build
+        run: |
+          xcodebuild build \
+            -project ScaleSync.xcodeproj \
+            -scheme ScaleSync \
+            -configuration "${{ matrix.configuration }}" \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            -quiet \
+            CODE_SIGNING_ALLOWED=NO
