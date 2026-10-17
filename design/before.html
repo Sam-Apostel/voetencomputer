@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Voetencomputer — current app (before)</title>
+<link rel="stylesheet" href="kit/device.css">
+<style>
+/* A faithful rebuild of the current SwiftUI screens (DashboardView, TrendsView,
+   SettingsView) with system colours: MetricColor green/orange/blue/mint/teal/indigo/pink. */
+:root{--bg:#fff;--grp:#F2F2F7;--cell:#fff;--label:#000;--sec:rgba(60,60,67,.6);--ter:rgba(60,60,67,.3);--sep:rgba(60,60,67,.29);
+--green:#34C759;--orange:#FF9500;--blue:#007AFF;--mint:#00C7BE;--teal:#30B0C7;--indigo:#5856D6;--pink:#FF2D55;--red:#FF3B30;--purple:#AF52DE;--gray3:#C7C7CC}
+.screen{background:var(--bg);color:var(--label)}
+.screen.grouped{background:var(--grp)}
+.tb{position:absolute;top:var(--safe-top);left:16px;right:16px;height:44px;display:flex;justify-content:flex-end;align-items:center}
+.tb .c{width:44px;height:44px;border-radius:22px;display:grid;place-items:center}
+.body{position:absolute;top:calc(var(--safe-top) + 44px);left:0;right:0;bottom:0;padding:0 16px;overflow:hidden}
+h1{font:700 34px/41px var(--sf);letter-spacing:.4px;margin:4px 0 12px}
+.card{border-radius:12px;padding:16px}
+.wc{background:rgba(52,199,89,.08);text-align:center;padding:20px 16px;display:flex;flex-direction:column;gap:4px;align-items:center}
+.big{font:700 54px/1.1 var(--sf-rounded);color:var(--green);font-variant-numeric:tabular-nums}
+.fn{font:400 13px/18px var(--sf);color:var(--sec)}
+.cap{font:400 12px/16px var(--sf);display:flex;gap:12px;color:var(--sec);margin-top:2px}
+.cap span{display:flex;gap:4px;align-items:center}
+.donut{display:grid;place-items:center;height:250px;position:relative}
+.lab{position:absolute;font:600 11px/13px var(--sf);text-align:center}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.tile{border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.tile .l{font:400 12px/16px var(--sf)}
+.tile .v{font:600 20px/25px var(--sf);font-variant-numeric:tabular-nums}
+.tabbar{position:absolute;left:20px;right:20px;bottom:21px;height:62px;border-radius:31px;display:flex;align-items:center;justify-content:space-around;padding:0 6px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;font:500 10px/12px var(--sf);color:var(--label);width:90px;padding:6px 0;border-radius:26px}
+.tab.on{color:var(--blue);background:rgba(0,0,0,.06)}
+.seg{display:flex;background:rgba(118,118,128,.12);border-radius:9px;padding:2px;margin-bottom:14px}
+.seg span{flex:1;text-align:center;font:500 13px/28px var(--sf)}
+.seg .on{background:#fff;border-radius:7px;box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
+.ch{border-radius:12px;padding:16px;margin-bottom:14px}
+.ch .h{display:flex;justify-content:space-between;align-items:baseline;font:600 15px/20px var(--sf)}
+.ch .h b{font:600 20px/25px var(--sf);color:var(--label);font-variant-numeric:tabular-nums}
+.sec{font:400 13px/18px var(--sf);color:var(--sec);text-transform:uppercase;margin:22px 16px 6px}
+.list{background:var(--cell);border-radius:26px;overflow:hidden}
+.row{min-height:44px;padding:11px 16px;font:400 17px/22px var(--sf);display:flex;align-items:center;justify-content:space-between;position:relative}
+.row+.row:before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.foot{font:400 13px/18px var(--sf);color:var(--sec);margin:6px 16px 0}
+.blue{color:var(--blue)}
+</style></head><body>
+
+<section class="screen" data-name="before-now" data-time="7:14" data-scrolls>
+  <div class="tb"><div class="c glass"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></div></div>
+  <div class="body" data-scrolls>
+    <h1>Voetencomputer</h1>
+    <div class="card wc">
+      <div class="big">78,4 kg</div>
+      <div class="fn" style="color:var(--green)">▼ 0,5 kg since last</div>
+      <div class="fn">17 Oct 2026 at 07:12</div>
+      <div class="cap"><span>Sam</span><span style="color:var(--pink)">In Apple Health</span></div>
+    </div>
+    <div class="donut">
+      <svg width="190" height="190" viewBox="0 0 190 190">
+        <g fill="none" stroke-width="34">
+          <circle cx="95" cy="95" r="78" stroke="#FF9500" stroke-dasharray="88 490" transform="rotate(-90 95 95)"/>
+          <circle cx="95" cy="95" r="78" stroke="#00C7BE" stroke-dasharray="196 490" transform="rotate(-23 95 95)"/>
+          <circle cx="95" cy="95" r="78" stroke="#30B0C7" stroke-dasharray="17 490" transform="rotate(124 95 95)"/>
+          <circle cx="95" cy="95" r="78" stroke="#C7C7CC" stroke-dasharray="170 490" transform="rotate(139 95 95)"/>
+        </g>
+      </svg>
+      <div class="lab" style="color:var(--orange);top:4px;right:92px">Fat</div>
+      <div class="lab" style="color:var(--mint);top:120px;right:16px">Muscle</div>
+      <div class="lab" style="color:var(--teal);bottom:2px;left:150px">Bone<br>4,3%</div>
+      <div class="lab" style="color:#8E8E93;top:110px;left:22px">Other</div>
+    </div>
+    <div class="grid">
+      <div class="tile" style="background:rgba(0,122,255,.08)"><div class="l" style="color:var(--blue)">Water</div><div class="v">57,9%</div></div>
+      <div class="tile" style="background:rgba(88,86,214,.08)"><div class="l" style="color:var(--indigo)">Lean mass</div><div class="v">64,0 kg</div></div>
+      <div class="tile" style="background:rgba(48,176,199,.08)"><div class="l" style="color:var(--teal)">Bone</div><div class="v">3,4 kg</div></div>
+      <div class="tile" style="background:rgba(255,45,85,.08)"><div class="l" style="color:var(--pink)">Daily energy</div><div class="v">2 637 kcal</div></div>
+    </div>
+  </div>
+  <div class="tabbar glass" data-system>
+    <div class="tab on">Now</div><div class="tab">Trends</div><div class="tab">Settings</div>
+  </div>
+</section>
+
+<section class="screen" data-name="before-trends" data-time="7:15">
+  <div class="body" data-scrolls>
+    <h1 style="margin-top:4px">Trends</h1>
+    <div class="seg" data-system><span>30d</span><span class="on">90d</span><span>1y</span><span>All</span></div>
+    <div class="ch" style="background:rgba(52,199,89,.06)">
+      <div class="h"><span style="color:var(--green)">Weight</span><b>78,4 kg</b></div>
+      <div class="fn" style="font-size:12px">−1,9 kg in 90 days</div>
+      <svg width="338" height="110" viewBox="0 0 338 110"><polyline fill="none" stroke="#34C759" stroke-width="2" points="0,22 30,30 60,26 90,40 120,44 150,38 180,58 210,62 240,70 270,66 300,80 338,86"/></svg>
+    </div>
+    <div class="ch" style="background:rgba(255,149,0,.06)">
+      <div class="h"><span style="color:var(--orange)">Body fat</span><b>18,4%</b></div>
+      <div class="fn" style="font-size:12px">−0,8% in 90 days</div>
+      <svg width="338" height="110" viewBox="0 0 338 110"><polyline fill="none" stroke="#FF9500" stroke-width="2" points="0,30 30,26 60,40 90,34 120,52 150,48 180,60 210,58 240,72 270,64 300,76 338,80"/></svg>
+    </div>
+    <div class="ch" style="background:rgba(0,199,190,.06)">
+      <div class="h"><span style="color:var(--mint)">Muscle</span><b>40,1%</b></div>
+      <div class="fn" style="font-size:12px">+0,4% in 90 days</div>
+      <svg width="338" height="110" viewBox="0 0 338 110"><polyline fill="none" stroke="#00C7BE" stroke-width="2" points="0,70 30,74 60,62 90,66 120,58 150,60 180,52 210,56 240,44 270,48 300,40 338,42"/></svg>
+    </div>
+  </div>
+  <div class="tabbar glass" data-system>
+    <div class="tab">Now</div><div class="tab on">Trends</div><div class="tab">Settings</div>
+  </div>
+</section>
+
+<section class="screen grouped" data-name="before-settings" data-time="7:16">
+  <div class="body" data-scrolls>
+    <h1>Settings</h1>
+    <div class="sec">Apple Health</div>
+    <div class="list"><div class="row" style="color:var(--green)">Connected to Apple Health</div><div class="row blue">Re-sync all measurements</div></div>
+    <div class="foot">Re-sync writes all of your measurements to Apple Health again, replacing what's there. Use it if entries are missing in Apple Health.</div>
+    <div class="sec">Me</div>
+    <div class="list"><div class="row">My profile<span style="color:var(--sec)">Sam</span></div><div class="row">Height (cm)<span style="color:var(--sec)">180</span></div></div>
+    <div class="foot">Only measurements from “Sam” are written to Apple Health. Weights display in kilograms, following your device's region settings.</div>
+    <div class="sec">Scale</div>
+    <div class="list"><div class="row" style="justify-content:flex-start;gap:14px"><div style="width:44px;height:44px;border-radius:9px;background:linear-gradient(135deg,#C7C7CC,#E5E5EA)"></div><div>Medisana scale<div class="fn" style="font-size:12px">Paired · tap to forget</div></div></div><div class="row">Profile names<span style="color:var(--ter)">›</span></div></div>
+  </div>
+  <div class="tabbar glass" data-system>
+    <div class="tab">Now</div><div class="tab">Trends</div><div class="tab on">Settings</div>
+  </div>
+</section>
+
+<script src="kit/device.js"></script>
+</body></html>

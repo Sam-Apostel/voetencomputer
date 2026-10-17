@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Voetencomputer — the nephew's drawing</title>
+<link rel="stylesheet" href="kit/device.css">
+<style>
+/* Tokens: DIRECTION.md › Tokens */
+:root{
+  --ground:#F6F7F2;--raised:#FFFFFF;--ink:#191B2C;--ink2:#4A4D63;--ink3:#6A6D82;--rule:rgba(25,27,44,.12);
+  --crayon:#2A39C4;--wash:rgba(42,57,196,.10);--on-crayon:#FFFFFF;
+  --hatch:repeating-linear-gradient(135deg,var(--crayon) 0 2.5px,transparent 2.5px 7px);
+  --r:var(--sf-rounded);
+}
+.dk,.screen[data-theme="dark"]{
+  --ground:#0F1233;--raised:#1A1E4A;--ink:#EEF0FA;--ink2:#B5BAD8;--ink3:#8D93B8;--rule:rgba(238,240,250,.14);
+  --crayon:#9AA6FF;--wash:rgba(154,166,255,.18);--hatch:repeating-linear-gradient(135deg,#9AA6FF 0 2.5px,transparent 2.5px 7px);--on-crayon:#0F1233;--glass-dark:rgba(40,46,100,.55);
+  background:var(--ground);color:var(--ink);
+}
+.screen,.mini-screen{background:var(--ground);color:var(--ink);font-family:var(--r);container-type:size}
+.tnum{font-variant-numeric:tabular-nums}
+svg.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex:none}
+
+/* type scale */
+.t-hero{font:800 104px/94px var(--r);letter-spacing:-4px}
+.t-title{font:700 34px/38px var(--r);letter-spacing:-.6px}
+.t-say{font:500 20px/26px var(--r);letter-spacing:-.2px}
+.t-body{font:400 17px/22px var(--r);letter-spacing:-.2px}
+.t-sec{font:500 15px/20px var(--r)}
+.t-meta{font:500 13px/17px var(--r)}
+
+/* chrome */
+.tb{position:absolute;top:var(--safe-top);left:16px;right:16px;height:44px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.pill{height:44px;border-radius:22px;padding:0 16px;display:flex;align-items:center;gap:8px;font:600 15px/1 var(--r);color:var(--ink)}
+.pill.who{padding:0 16px 0 6px}
+.av{width:32px;height:32px;border-radius:16px;background:var(--crayon);color:var(--on-crayon);display:grid;place-items:center;font:700 15px/1 var(--r)}
+.circ{width:44px;height:44px;border-radius:22px;display:grid;place-items:center;color:var(--ink)}
+.tabbar{--glass:rgba(246,247,242,.2);position:absolute;left:20px;right:20px;bottom:21px;height:62px;border-radius:31px;display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:5}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font:600 10px/12px var(--r);width:104px;padding:7px 0 6px;border-radius:26px;color:var(--ink)}
+.tab.on{color:var(--crayon);background:var(--wash)}
+.tabbar.glass{box-shadow:inset 0 .5px 0 rgba(255,255,255,.6),inset 0 0 0 .5px rgba(25,27,44,.08),0 8px 24px rgba(15,18,51,.10)}
+.body{position:absolute;inset:calc(var(--safe-top) + 52px) 0 0;display:flex;flex-direction:column;padding:0 20px}
+
+/* drawn things */
+.feet use,.feet path,.feet circle{stroke:var(--crayon);stroke-linecap:round;stroke-linejoin:round}
+.tick path{stroke:var(--crayon);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* ───── Now ───── */
+.now .date{color:var(--ink2);margin-top:6px}
+.now .stage{position:relative;flex:none;margin-top:36px;display:flex;flex-direction:column;align-items:flex-start}
+.now .stage svg.feet{display:block;height:196px;width:auto;margin:0 0 14px 86px}
+.now .num{position:relative;display:flex;align-items:flex-end;gap:6px}
+.now .num small{font:700 28px/1 var(--r);letter-spacing:0;margin-bottom:12px;color:var(--ink2)}
+.now .say{margin-top:14px}
+.now .ok{display:flex;align-items:center;gap:6px;color:var(--crayon);margin-top:8px;font-weight:600}
+.now .comp{margin-top:28px;display:block;color:inherit;text-decoration:none}
+.now .comp .head{display:flex;justify-content:space-between;align-items:center;color:var(--ink2);margin-bottom:10px}
+.now .comp .head span:last-child{display:flex;align-items:center;gap:2px;color:var(--ink)}
+.bar{display:flex;height:28px;gap:3px;filter:url(#crayon)}
+.bar i{border-radius:7px;border:2.5px solid var(--crayon);display:block}
+.bar .fat,.sw.fat{background:var(--crayon)}
+.bar .mus,.sw.mus{background:var(--hatch)}
+.bar .bone,.sw.bone{background:var(--wash)}
+.legend{display:grid;grid-template-columns:repeat(4,auto);justify-content:space-between;margin-top:10px;color:var(--ink2)}
+.legend b{display:block;font:700 17px/22px var(--r);color:var(--ink);letter-spacing:-.2px}
+.legend span{display:flex;flex-direction:column}
+.legend em{font-style:normal;display:flex;align-items:center;gap:5px}
+.sw{width:12px;height:12px;border-radius:3px;border:2px solid var(--crayon);display:inline-block}
+.sw.none{border-style:dashed}
+.body.now{padding-bottom:104px}
+.now .hh{margin-top:auto;padding-top:20px;margin-bottom:0;color:var(--ink2);display:flex;gap:10px;align-items:flex-start}
+.now .hh svg{flex:none;margin-top:1px}
+@container (max-height:760px){.screen .now-hh,.screen .now .date{display:none}.screen .now .stage{margin-top:8px}.screen .now .stage svg.feet{height:120px;margin:0 0 20px 104px}.screen .now .comp{margin-top:20px}.screen .now .say{margin-top:10px}}
+
+/* storyboard states (on mini-screens) */
+.st-listen .feet use{stroke-dasharray:2 9;--wash:transparent}
+.st-listen .num{color:var(--ink3)}
+.st-listen .say,.st-listen .ok,.st-listen .comp,.st-press .ok,.st-press .comp{visibility:hidden}
+.st-press .feet .right{transform:scale(1.04);transform-origin:70% 80%}
+.st-press .feet .right use{--wash:transparent}
+.st-press .num{color:var(--ink2)}
+.st-press .say{visibility:hidden}
+.st-half .ok .tick path{stroke-dasharray:.68 1}
+.st-half .ok .tick{width:30px;height:30px}
+.st-half .ok .tick .tip{display:block}
+.tick .tip{display:none;fill:var(--crayon)}
+.st-half .comp{visibility:hidden}
+
+/* ───── Body ───── */
+.bodyv .meta{color:var(--ink2);margin-top:4px}
+.bodyv .fig{display:flex;gap:16px;margin-top:28px;flex:none}
+.bodyv .col{width:112px;height:360px;display:flex;flex-direction:column;gap:4px;flex:none;filter:url(#crayon)}
+.bodyv .col i{display:block;border:2.5px solid var(--crayon);border-radius:9px}
+.bodyv .labels{display:flex;flex-direction:column;gap:4px;flex:1}
+.bodyv .labels div{display:flex;flex-direction:column;justify-content:center}
+.bodyv .labels b{font:700 20px/26px var(--r);letter-spacing:-.2px}
+.bodyv .labels span{color:var(--ink2)}
+.rows{margin-top:32px}
+.rw{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:8px 0;border-top:.5px solid var(--rule);gap:12px}
+.rw .k{display:flex;flex-direction:column}
+.rw .k span{color:var(--ink2)}
+.rw .v{font:600 17px/22px var(--r);font-variant-numeric:tabular-nums;text-align:right;display:flex;align-items:center;gap:10px}
+.band{position:relative;height:40px}
+.band .segs{display:flex;gap:3px;height:12px;filter:url(#crayon)}
+.band .segs i{display:block;border:2px solid var(--crayon);border-radius:4px}
+.band b{position:absolute;top:-6px;width:4px;height:24px;margin-left:-2px;border-radius:2px;background:var(--ink);box-shadow:0 0 0 2px var(--ground)}
+.band .bl span{position:absolute;top:20px;transform:translateX(-50%);color:var(--ink2)}
+.hmark{display:inline-flex;align-items:center;gap:3px;color:var(--crayon);font:600 13px/17px var(--r)}
+
+/* ───── Trends ───── */
+.seg{display:flex;gap:4px;padding:4px;border-radius:22px;background:var(--raised);box-shadow:inset 0 0 0 1px var(--rule);margin-top:16px}
+.seg span{flex:1;text-align:center;font:600 15px/36px var(--r);border-radius:18px;color:var(--ink2)}
+.seg .on{background:var(--crayon);color:var(--on-crayon)}
+.trends .hero{margin-top:28px}
+.trends .sub{color:var(--ink2);margin-top:8px}
+.trends .chart{margin:20px 0 0;flex:none}
+.body.trends{padding-bottom:110px}
+.mrow{display:grid;grid-template-columns:1fr 72px 92px;align-items:center;gap:12px;min-height:58px;border-top:.5px solid var(--rule)}
+.mrow .k{display:flex;flex-direction:column}.mrow .k span{color:var(--ink2)}
+.mrow .v{font:600 17px/22px var(--r);text-align:right;font-variant-numeric:tabular-nums}
+.foot{color:var(--ink2);margin-top:14px}
+
+/* ───── Sheet ───── */
+.dim{position:absolute;inset:0;background:rgba(15,18,51,.32);z-index:6}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:calc(100% - 70px);background:var(--raised);border-radius:38px 38px 0 0;z-index:7;padding:0 20px;display:flex;flex-direction:column}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--rule);margin:8px auto 18px}
+.who .sub{color:var(--ink2);margin-top:8px}
+.choice{display:flex;align-items:center;gap:14px;min-height:72px;border-top:.5px solid var(--rule)}
+.choice:last-child{border-bottom:.5px solid var(--rule)}
+.radio{width:26px;height:26px;border-radius:13px;border:2.5px solid var(--rule);flex:none}
+.choice.on .radio{border-color:var(--crayon);background:radial-gradient(circle,var(--crayon) 0 6px,transparent 6.5px)}
+.choice .pair{width:52px;height:52px;flex:none;display:grid;place-items:center}
+.choice .k{display:flex;flex-direction:column;flex:1}
+.choice .k span{color:var(--ink2)}
+.field{font:600 17px/22px var(--r);border-bottom:2px solid var(--crayon);padding-bottom:2px;display:inline-block;min-width:120px}
+.btn{height:54px;border-radius:27px;background:var(--crayon);color:var(--on-crayon);display:flex;align-items:center;justify-content:center;font:700 17px/1 var(--r);letter-spacing:-.2px}
+.btn2{height:44px;display:flex;align-items:center;justify-content:center;color:var(--ink);font:600 17px/1 var(--r)}
+
+/* ───── First run ───── */
+.first .art{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px 0}
+.first .art svg{height:100%;max-height:330px;width:auto}
+.first .lede{color:var(--ink2);margin-top:10px}
+.check{display:flex;align-items:center;justify-content:space-between;min-height:56px;border-top:.5px solid var(--rule)}
+.check .k{display:flex;align-items:center;gap:12px}
+.minibtn{height:36px;padding:0 16px;border-radius:18px;background:var(--crayon);color:var(--on-crayon);font:700 15px/36px var(--r)}
+.listen{display:flex;align-items:center;gap:10px;color:var(--ink2);margin:20px 0 44px}
+.listen i{width:10px;height:10px;border-radius:5px;background:var(--crayon);box-shadow:0 0 0 5px var(--wash)}
+
+/* ───── Household ───── */
+.hh-sec{color:var(--ink2);margin:28px 0 6px}
+.group{border-top:.5px solid var(--rule);border-bottom:.5px solid var(--rule)}
+.hrow{display:flex;align-items:center;gap:14px;min-height:62px;position:relative}
+.hrow+.hrow:before{content:"";position:absolute;top:0;left:50px;right:0;height:.5px;background:var(--rule)}
+.hrow.sub{min-height:48px}
+.hh-sec{font-weight:600!important}
+.hrow .g{width:36px;height:36px;display:grid;place-items:center;flex:none}
+.hrow .k{flex:1;display:flex;flex-direction:column}
+.hrow .k span{color:var(--ink2)}
+.hrow .chev{color:var(--ink3)}
+.switch{width:52px;height:32px;border-radius:16px;background:rgba(120,120,140,.22);position:relative;flex:none}
+.switch:after{content:"";position:absolute;left:2px;top:2px;width:28px;height:28px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+
+/* ───── Storyboard panel ───── */
+.board{position:absolute;inset:0;padding:26px 26px 0;display:flex;flex-direction:column}
+.board h2{margin:0}
+.board .lede{color:var(--ink2);margin-top:6px}
+.frames{display:grid;grid-template-columns:repeat(2,auto);justify-content:space-between;row-gap:12px;margin-top:16px}
+.frames figure{margin:0;display:flex;flex-direction:column;gap:6px}
+.frames figcaption{color:var(--ink2)}
+.frames figcaption b{color:var(--ink);font-weight:700}
+.mini{box-shadow:0 0 0 1px var(--rule)}
+.frames figure{position:relative}
+.inset{position:absolute;right:8px;top:232px;width:76px;height:76px;border-radius:38px;background:var(--raised);box-shadow:0 0 0 2px var(--crayon);display:grid;place-items:center}
+/* lock screen */
+.lock{position:absolute;inset:0;background:#0F1233;color:#fff;display:flex;flex-direction:column;align-items:center}
+.lock .d{font:600 22px/1 var(--sf);margin-top:76px;opacity:.9}
+.lock .t{font:700 104px/1 var(--sf-rounded);letter-spacing:-2px;margin-top:4px}
+.note{position:absolute;left:10px;right:10px;bottom:120px;border-radius:26px;padding:14px 14px;display:flex;gap:12px;color:#fff}
+.note .ai{width:40px;height:40px;border-radius:10px;flex:none;overflow:hidden}
+.note .k{display:flex;flex-direction:column;gap:2px;font:400 17px/22px var(--sf)}
+.note .k b{display:flex;justify-content:space-between;font:600 17px/22px var(--sf)}
+.note .k b span{font-weight:400;opacity:.6}
+
+/* ───── Icon ───── */
+.app-icon{background:#F6F7F2}
+</style></head><body>
+
+<!-- Shared drawings. A left foot, big toe on the inside; the right foot is the mirror. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="crayon" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3.4"/></filter>
+    <symbol id="foot" viewBox="0 0 100 236" overflow="visible">
+      <path class="sole" d="M50 226c-20 0-28-20-26-42 2-20-6-46-4-74 1-22 8-40 24-44 17-4 36 0 41 18 4 16-6 32-12 46-6 15 0 30 0 50 0 30-8 46-23 46z" style="fill:var(--wash)"/>
+      <path d="M50 226c-20 0-28-20-26-42 2-20-6-46-4-74 1-22 8-40 24-44 17-4 36 0 41 18 4 16-6 32-12 46-6 15 0 30 0 50 0 30-8 46-23 46z" transform="translate(2.2 -1.6) rotate(.8 50 120)" style="fill:none;stroke-width:2.2;opacity:.45"/>
+      <circle cx="74" cy="46" r="12" style="fill:none"/><circle cx="54" cy="36" r="8" style="fill:none"/><circle cx="39" cy="39" r="7" style="fill:none"/><circle cx="27" cy="48" r="6" style="fill:none"/><circle cx="19" cy="60" r="5" style="fill:none"/>
+    </symbol>
+    <symbol id="pair" viewBox="0 0 120 120" overflow="visible">
+      <g filter="url(#crayon)" style="stroke:var(--crayon);stroke-width:5;stroke-linecap:round;stroke-linejoin:round">
+        <use href="#foot" x="6" y="8" width="44" height="104" transform="rotate(-6 28 60)"/>
+        <use href="#foot" x="-114" y="4" width="44" height="104" transform="scale(-1 1) rotate(-4 -92 56)"/>
+      </g>
+    </symbol>
+    <symbol id="boardglyph" viewBox="0 0 36 36">
+      <rect x="3" y="9" width="30" height="20" rx="3" style="fill:none;stroke:var(--crayon);stroke-width:2.2"/>
+      <rect x="20" y="14" width="8" height="9" rx="1.5" style="fill:var(--crayon)"/>
+      <path d="M8 9V4M13 9V5.5c0-1 1-1.5 2-1" style="fill:none;stroke:var(--crayon);stroke-width:2;stroke-linecap:round"/>
+      <path d="M8 23h7" style="stroke:var(--crayon);stroke-width:2;stroke-linecap:round"/>
+    </symbol>
+    <symbol id="scaleglyph" viewBox="0 0 36 36">
+      <rect x="4" y="4" width="28" height="28" rx="7" style="fill:none;stroke:var(--crayon);stroke-width:2.2"/>
+      <rect x="13" y="9" width="10" height="5" rx="1.5" style="fill:var(--crayon)"/>
+      <path d="M12 21v6M24 21v6" style="stroke:var(--crayon);stroke-width:2.2;stroke-linecap:round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- The Now screen, used by frames 1, 5 and the storyboard minis. -->
+<template id="now-tpl">
+  <div class="tb">
+    <div class="pill who glass"><span class="av">S</span>Sam</div>
+    <div class="pill glass"><svg class="ic" style="width:18px;height:18px;color:var(--crayon)" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg><span class="tnum">Synced 07:12</span></div>
+  </div>
+  <div class="body now">
+    <div class="date t-sec">Saturday, 07:12</div>
+    <div class="stage">
+      <svg class="feet" viewBox="0 8 250 282" aria-hidden="true">
+        <g style="stroke-width:4.5" filter="url(#crayon)">
+          <g class="left"><use href="#foot" x="24" y="34" width="100" height="236" transform="rotate(-7 74 150)"/></g>
+          <g class="right"><use href="#foot" x="-238" y="16" width="100" height="236" transform="scale(-1 1) rotate(-5 -188 134)"/></g>
+        </g>
+      </svg>
+      <div class="num t-hero tnum"><span class="n">78,4</span><small>kg</small></div>
+    </div>
+    <div class="say t-say">Half a kilo lighter than Thursday.</div>
+    <div class="ok t-sec"><svg class="tick" width="22" height="22" viewBox="0 0 24 24"><path pathLength="1" d="M4.5 12.8c1.6 1.2 3 2.6 4.3 4.4C11 12.4 14.6 8.6 19.6 5.6"/><circle class="tip" cx="15" cy="10.6" r="2"/></svg>In Apple Health</div>
+    <a class="comp">
+      <div class="head t-meta"><span>Body composition</span><span class="t-sec">Body<svg class="ic" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></div>
+      <div class="bar"><i class="fat" style="flex:18.4"></i><i class="mus" style="flex:40.1"></i><i class="bone" style="flex:4.3"></i><i style="flex:37.2"></i></div>
+      <div class="legend t-meta">
+        <span><b class="tnum">18,4%</b><em><i class="sw fat"></i>fat</em></span>
+        <span><b class="tnum">40,1%</b><em><i class="sw mus"></i>muscle</em></span>
+        <span><b class="tnum">3,4 kg</b><em><i class="sw bone"></i>bone</em></span>
+        <span style="text-align:right;align-items:flex-end"><b class="tnum">57,9%</b><em>water</em></span>
+      </div>
+    </a>
+    <div class="hh now-hh t-sec"><svg width="26" height="26" viewBox="0 0 120 120"><use href="#pair"/></svg><span>Lien stepped on at 06:48. Her numbers went to her phone.</span></div>
+  </div>
+  <div class="tabbar glass" data-system>
+    <div class="tab on"><svg class="ic" viewBox="0 0 24 24"><path d="M9 5c2.4 0 3 3 3 6.5S11 19 8.6 19 6 15.5 6 12s.6-7 3-7zM16.5 8c1.7 0 2.5 1.8 2.5 4.5s-.8 5-2.5 5S14 15 14 12.5 14.8 8 16.5 8z"/></svg>Now</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M3.5 16.5c2.6-.6 3.6-6 6.6-6s2.8 4.8 5.6 4.2c2.6-.6 3-5.6 4.8-7.2"/></svg>Trends</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M4 11.2 12 4.5l8 6.7V20H4z"/><path d="M10 20v-5h4v5"/></svg>Household</div>
+  </div>
+</template>
+
+<!-- 1 · Now -->
+<section class="screen" data-name="now" data-time="7:14" data-clone="now"></section>
+
+<!-- 2 · Body -->
+<section class="screen" data-name="body" data-time="7:15">
+  <div class="tb">
+    <div class="circ glass"><svg class="ic" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></div>
+  </div>
+  <div class="body bodyv" data-scrolls>
+    <div class="t-title" style="margin-top:6px">Saturday's body</div>
+    <div class="meta t-sec tnum">07:12 · BS 650 · P1</div>
+    <div class="fig">
+      <div class="col">
+        <i style="flex:29.2;border-style:dashed"></i>
+        <i style="flex:14.4;background:var(--crayon)"></i>
+        <i style="flex:31.4;background:var(--hatch)"></i>
+        <i style="flex:3.4;background:var(--wash);min-height:22px"></i>
+      </div>
+      <div class="labels">
+        <div style="flex:29.2"><b class="tnum">29,2 kg</b><span class="t-sec">the rest: organs, blood, skin</span></div>
+        <div style="flex:14.4"><b class="tnum">14,4 kg</b><span class="t-sec">fat · 18,4%</span></div>
+        <div style="flex:31.4"><b class="tnum">31,4 kg</b><span class="t-sec">muscle · 40,1%</span></div>
+        <div style="flex:3.4;min-height:22px;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px"><b class="tnum" style="font-size:17px;line-height:22px">3,4 kg</b><span class="t-sec">bone</span></div>
+      </div>
+    </div>
+    <div class="rows">
+      <div class="rw"><div class="k"><span class="t-body" style="color:var(--ink)">Body fat</span></div><div class="v">18,4%<span class="hmark"><svg class="tick" width="16" height="16" viewBox="0 0 24 24"><path d="M4.5 12.8c1.6 1.2 3 2.6 4.3 4.4C11 12.4 14.6 8.6 19.6 5.6"/></svg>Health</span></div></div>
+      <div class="rw"><div class="k"><span class="t-body" style="color:var(--ink)">Lean mass</span></div><div class="v">64,0 kg<span class="hmark"><svg class="tick" width="16" height="16" viewBox="0 0 24 24"><path d="M4.5 12.8c1.6 1.2 3 2.6 4.3 4.4C11 12.4 14.6 8.6 19.6 5.6"/></svg>Health</span></div></div>
+      <div class="rw" style="flex-direction:column;align-items:stretch;gap:10px;padding:12px 0 14px"><div style="display:flex;justify-content:space-between;align-items:center"><div class="k"><span class="t-body" style="color:var(--ink)">BMI</span><span class="t-meta">in the healthy band, 18,5 to 25</span></div><div class="v">24,2<span class="hmark"><svg class="tick" width="16" height="16" viewBox="0 0 24 24"><path d="M4.5 12.8c1.6 1.2 3 2.6 4.3 4.4C11 12.4 14.6 8.6 19.6 5.6"/></svg>Health</span></div></div>
+        <div class="band"><div class="segs"><i style="flex:3.5"></i><i style="flex:6.5;background:var(--wash)"></i><i style="flex:5"></i><i style="flex:10"></i></div><b style="left:36.8%"></b>
+        <div class="bl t-meta"><span style="left:14%">18,5</span><span style="left:40%">25</span><span style="left:60%">30</span></div></div></div>
+      <div class="rw"><div class="k"><span class="t-body" style="color:var(--ink)">Water</span><span class="t-meta">overlaps muscle, so it's not in the column</span></div><div class="v">57,9%</div></div>
+      <div class="rw" style="margin-bottom:104px"><div class="k"><span class="t-body" style="color:var(--ink)">Daily energy</span><span class="t-meta">what the scale estimates you burn</span></div><div class="v">2 637 kcal</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · Trends -->
+<section class="screen trends-s" data-name="trends" data-time="7:16">
+  <div class="tb" style="justify-content:center"><span style="font:600 17px/1 var(--r)">Trends</span></div>
+  <div class="body trends" data-scrolls>
+    <div class="seg" data-system style="margin-top:4px"><span>30 days</span><span class="on">90 days</span><span>1 year</span><span>All</span></div>
+    <div class="hero t-title">Down 1,9 kg since the end of July.</div>
+    <div class="sub t-body">Steady for the last two weeks.</div>
+    <svg class="chart" style="width:100%;height:auto" width="362" height="200" viewBox="0 0 362 200" aria-label="Weight over 90 days">
+      <g style="fill:var(--ink3);font:500 13px var(--sf-rounded)">
+        <text x="0" y="47">80</text><text x="0" y="110">79</text><text x="0" y="172">78</text>
+        <text x="34" y="194">Jul</text><text x="76" y="194">Aug</text><text x="177" y="194">Sep</text><text x="274" y="194">Oct</text>
+      </g>
+      <g style="stroke:var(--rule);stroke-width:1"><path d="M34 43.2H346M34 105.6H346M34 168.0H346"/></g>
+      <g style="fill:var(--crayon);opacity:.45"><circle cx="40.5" cy="23.7" r="2.4"/><circle cx="43.7" cy="34.3" r="2.4"/><circle cx="47.0" cy="43.0" r="2.4"/><circle cx="53.5" cy="39.4" r="2.4"/><circle cx="56.7" cy="42.7" r="2.4"/><circle cx="60.0" cy="24.0" r="2.4"/><circle cx="63.2" cy="31.9" r="2.4"/><circle cx="69.7" cy="36.7" r="2.4"/><circle cx="72.9" cy="35.0" r="2.4"/><circle cx="79.4" cy="26.1" r="2.4"/><circle cx="82.7" cy="52.6" r="2.4"/><circle cx="92.4" cy="43.9" r="2.4"/><circle cx="95.6" cy="60.2" r="2.4"/><circle cx="118.4" cy="66.3" r="2.4"/><circle cx="121.6" cy="67.6" r="2.4"/><circle cx="124.8" cy="44.0" r="2.4"/><circle cx="131.3" cy="68.7" r="2.4"/><circle cx="144.3" cy="80.1" r="2.4"/><circle cx="147.6" cy="85.9" r="2.4"/><circle cx="150.8" cy="81.4" r="2.4"/><circle cx="167.0" cy="70.2" r="2.4"/><circle cx="183.2" cy="103.8" r="2.4"/><circle cx="196.2" cy="104.7" r="2.4"/><circle cx="206.0" cy="71.6" r="2.4"/><circle cx="209.2" cy="95.1" r="2.4"/><circle cx="212.4" cy="97.5" r="2.4"/><circle cx="225.4" cy="111.6" r="2.4"/><circle cx="241.6" cy="126.5" r="2.4"/><circle cx="251.4" cy="128.1" r="2.4"/><circle cx="254.6" cy="126.4" r="2.4"/><circle cx="264.4" cy="141.0" r="2.4"/><circle cx="274.1" cy="153.2" r="2.4"/><circle cx="283.8" cy="160.7" r="2.4"/><circle cx="287.1" cy="150.5" r="2.4"/><circle cx="290.3" cy="147.3" r="2.4"/><circle cx="300.0" cy="125.3" r="2.4"/><circle cx="303.3" cy="153.7" r="2.4"/><circle cx="309.8" cy="150.2" r="2.4"/><circle cx="313.0" cy="162.8" r="2.4"/><circle cx="316.3" cy="136.5" r="2.4"/></g>
+      <path d="M34.0 24.9 53.5 30.5 72.9 40.1 92.4 48.5 111.9 58.1 131.3 66.8 150.8 74.7 170.3 84.3 189.7 94.5 209.2 102.6 228.7 113.4 248.1 122.5 267.6 132.3 287.1 139.3 306.5 142.3 326.0 142.2 326.0 143.0" filter="url(#crayon)" style="fill:none;stroke:var(--crayon);stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round"/>
+      <path d="M324.0 131.0c9-2 16 4 15 12s-10 12-18 10-11-9-7-15 8-8 13-6" filter="url(#crayon)" style="fill:none;stroke:var(--crayon);stroke-width:2.6;stroke-linecap:round"/>
+      <circle cx="326.0" cy="143.0" r="3.6" style="fill:var(--crayon)"/>
+    </svg>
+    <div class="foot t-meta" style="margin:6px 0 14px">Weight, body fat, lean mass and BMI include your whole Apple Health history, from every app.</div>
+    <div>
+      <div class="mrow"><div class="k"><span class="t-body" style="color:var(--ink);font-weight:600">Body fat</span><span class="t-meta">−0,8 in 90 days</span></div><svg width="72" height="26" viewBox="0 0 72 26"><path d="M2 6c8 2 10 6 18 5s10 6 18 8 12-2 18 3 8 2 14 2" filter="url(#crayon)" style="fill:none;stroke:var(--crayon);stroke-width:2.5;stroke-linecap:round"/></svg><div class="v">18,4%</div></div>
+      <div class="mrow"><div class="k"><span class="t-body" style="color:var(--ink);font-weight:600">Muscle</span><span class="t-meta">+0,4 in 90 days</span></div><svg width="72" height="26" viewBox="0 0 72 26"><path d="M2 20c8 0 10-4 18-3s10-6 18-6 12 0 18-4 8 0 14-1" filter="url(#crayon)" style="fill:none;stroke:var(--crayon);stroke-width:2.5;stroke-linecap:round"/></svg><div class="v">40,1%</div></div>
+      <div class="mrow"><div class="k"><span class="t-body" style="color:var(--ink);font-weight:600">Water</span><span class="t-meta">+0,2 in 90 days</span></div><svg width="72" height="26" viewBox="0 0 72 26"><path d="M2 16c8-2 10 2 18-1s10 0 18-2 12 2 18-2 8 0 14-1" filter="url(#crayon)" style="fill:none;stroke:var(--crayon);stroke-width:2.5;stroke-linecap:round"/></svg><div class="v">57,9%</div></div>
+      <div class="mrow"><div class="k"><span class="t-body" style="color:var(--ink);font-weight:600">Bone</span><span class="t-meta">no change</span></div><svg width="72" height="26" viewBox="0 0 72 26"><path d="M2 13c8 1 10-1 18 0s10 1 18 0 12-1 18 0 8 1 14 0" filter="url(#crayon)" style="fill:none;stroke:var(--crayon);stroke-width:2.5;stroke-linecap:round"/></svg><div class="v">3,4 kg</div></div>
+      
+    </div>
+  </div>
+  <div class="tabbar glass" data-system>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M9 5c2.4 0 3 3 3 6.5S11 19 8.6 19 6 15.5 6 12s.6-7 3-7zM16.5 8c1.7 0 2.5 1.8 2.5 4.5s-.8 5-2.5 5S14 15 14 12.5 14.8 8 16.5 8z"/></svg>Now</div>
+    <div class="tab on"><svg class="ic" viewBox="0 0 24 24"><path d="M3.5 16.5c2.6-.6 3.6-6 6.6-6s2.8 4.8 5.6 4.2c2.6-.6 3-5.6 4.8-7.2"/></svg>Trends</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M4 11.2 12 4.5l8 6.7V20H4z"/><path d="M10 20v-5h4v5"/></svg>Household</div>
+  </div>
+</section>
+
+<!-- 4 · Signature: footprints -->
+<section class="screen" data-name="signature" data-chrome="none">
+  <div class="board">
+    <h2 class="t-title">Footprints</h2>
+    <div class="lede t-sec">Under a second, from the reading arriving to the tick.</div>
+    <div class="frames">
+      <figure><div class="mini" style="--mini:.39"><div class="mini-screen st-listen" data-time="7:12" data-clone="now" data-num="––,–"></div></div><figcaption class="t-meta"><b>0 ms</b> · dotted feet, listening</figcaption></figure>
+      <figure><div class="mini" style="--mini:.39"><div class="mini-screen st-press" data-time="7:12" data-clone="now" data-lcd="78,9"></div></div><figcaption class="t-meta"><b>300 ms</b> · feet press, digits hunt</figcaption></figure>
+      <figure><div class="mini" style="--mini:.39"><div class="mini-screen st-half" data-time="7:12" data-clone="now"></div></div>
+        <div class="inset" aria-label="The tick, mid-draw, magnified"><svg class="tick" width="56" height="56" viewBox="0 0 24 24"><path d="M4.5 12.8c1.6 1.2 3 2.6 4.3 4.4C11 12.4 14.6 8.6 19.6 5.6" style="stroke-width:2.6;opacity:.18"/><path pathLength="1" d="M4.5 12.8c1.6 1.2 3 2.6 4.3 4.4C11 12.4 14.6 8.6 19.6 5.6" style="stroke-dasharray:.68 1;stroke-width:2.6"/><circle cx="15" cy="10.6" r="1.7" style="fill:var(--crayon)"/></svg></div><figcaption class="t-meta"><b>800 ms</b> · 78,4 locks, tick drawing</figcaption></figure>
+      <figure><div class="mini" style="--mini:.39"><div class="mini-screen" data-chrome="light" data-time="7:13">
+        <div class="lock"><div class="d">Saturday 17 October</div><div class="t">7:13</div></div>
+        <div class="note glass-dark">
+          <div class="ai"><svg width="40" height="40" viewBox="0 0 344 344"><use href="#iconart"/></svg></div>
+          <div class="k"><b>Voetencomputer <span>now</span></b>78,4 kg, in Apple Health. Half a kilo lighter than Thursday.</div>
+        </div>
+      </div></div><figcaption class="t-meta"><b>Phone in a pocket</b> · the receipt</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · Now, dark -->
+<section class="screen" data-name="now-dark" data-time="21:03" data-theme="dark" data-clone="now" data-comp="Composition from Thursday, 06:58"></section>
+
+<!-- 6 · Who was that? -->
+<section class="screen" data-name="who" data-time="9:02">
+  <div data-behind><template-slot data-clone-inner="now"></template-slot></div>
+  <div class="dim" data-behind></div>
+  <div class="sheet who">
+    <div class="grab"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end"><div class="t-title">Who was that?</div><svg width="46" height="46" viewBox="0 0 120 120" style="--wash:transparent;stroke-dasharray:2 7;margin-bottom:-2px"><use href="#pair"/></svg></div>
+    <div class="sub t-body">Someone weighed 23,8 kg yesterday at 16:40. The scale didn't know them, and nobody here is within 3&nbsp;kg.</div>
+    <div style="margin-top:20px">
+      <div class="choice"><div class="pair"><svg width="50" height="50" viewBox="0 0 120 120"><use href="#pair"/></svg></div><div class="k"><b class="t-body" style="font-weight:600">Sam</b><span class="t-sec tnum">last 78,4 kg</span></div><i class="radio"></i></div>
+      <div class="choice"><div class="pair"><svg width="42" height="42" viewBox="0 0 120 120"><use href="#pair"/></svg></div><div class="k"><b class="t-body" style="font-weight:600">Lien</b><span class="t-sec tnum">last 61,7 kg</span></div><i class="radio"></i></div>
+      <div class="choice on"><div class="pair"><svg width="30" height="30" viewBox="0 0 120 120"><use href="#pair"/></svg></div><div class="k"><span class="t-sec">A guest called</span><span class="field" style="color:var(--ink)">Mats</span></div><i class="radio"></i></div>
+    </div>
+    <div style="margin-top:24px;margin-bottom:34px;display:flex;flex-direction:column;gap:6px">
+      <div class="btn">Keep as Mats (guest)</div>
+      <div class="btn2">Not one of us</div>
+      <div class="t-meta" style="color:var(--ink2);text-align:center">Guests never go to Apple Health.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · First run -->
+<section class="screen" data-name="first-run" data-time="20:47">
+  <div class="body first">
+    <div class="art">
+      <svg viewBox="0 0 300 330" aria-hidden="true">
+        <path d="M44 22c70-6 150-6 212 0 16 2 24 10 26 26 5 80 5 160 0 236-2 16-10 24-26 26-70 6-140 6-212 0-16-2-24-10-26-26-5-80-5-158 0-236 2-16 10-24 26-26z" filter="url(#crayon)" style="fill:var(--wash);stroke:var(--crayon);stroke-width:4.5;stroke-linejoin:round"/>
+        <rect x="118" y="44" width="64" height="26" rx="6" style="fill:var(--crayon)"/>
+        <g style="stroke:var(--crayon);stroke-width:4" class="st-dots" filter="url(#crayon)">
+          <use href="#foot" x="62" y="88" width="80" height="190" transform="rotate(-7 102 183)" style="stroke-dasharray:2 9;--wash:transparent"/>
+          <use href="#foot" x="-238" y="80" width="80" height="190" transform="scale(-1 1) rotate(-5 -198 175)" style="stroke-dasharray:2 9;--wash:transparent"/>
+        </g>
+      </svg>
+    </div>
+    <div class="t-title">Step on the scale.</div>
+    <div class="lede t-body">Barefoot, phone nearby. It pairs by itself and brings every reading it has kept.</div>
+    <div style="margin-top:24px">
+      <div class="check"><div class="k"><svg width="28" height="28" viewBox="0 0 36 36"><use href="#scaleglyph"/></svg><span class="t-body">Scale in Bluetooth mode</span></div><span class="t-sec" style="color:var(--crayon);font-weight:600">How?</span></div>
+      <div class="check" style="border-bottom:.5px solid var(--rule)"><div class="k"><svg class="tick" width="28" height="28" viewBox="0 0 24 24" style="opacity:.35"><path d="M4.5 12.8c1.6 1.2 3 2.6 4.3 4.4C11 12.4 14.6 8.6 19.6 5.6"/></svg><span class="t-body">Apple Health</span></div><span class="minibtn">Allow</span></div>
+    </div>
+    <div class="listen t-sec"><i></i>Listening for a BS 410, 444 or 650</div>
+  </div>
+</section>
+
+<!-- 8 · Household -->
+<section class="screen" data-name="household" data-time="7:18">
+  <div class="body hhv" data-scrolls>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:-6px">
+      <div class="t-title">Household</div>
+      <svg width="176" height="116" viewBox="0 0 176 116" aria-label="Three pairs of feet on a bath mat">
+        <g filter="url(#crayon)">
+          <rect x="10" y="8" width="156" height="100" rx="16" style="fill:var(--wash);stroke:var(--crayon);stroke-width:2.6"/>
+          <path d="M4 22v-6M4 40v-6M4 58v-6M4 76v-6M4 94v-6M172 22v-6M172 40v-6M172 58v-6M172 76v-6M172 94v-6" style="stroke:var(--crayon);stroke-width:2.2;stroke-linecap:round"/>
+        </g>
+        <svg x="18" y="22" width="64" height="64" viewBox="0 0 120 120"><use href="#pair"/></svg>
+        <svg x="86" y="30" width="50" height="50" viewBox="0 0 120 120"><use href="#pair"/></svg>
+        <svg x="138" y="44" width="26" height="26" viewBox="0 0 120 120" style="--wash:transparent;stroke-dasharray:2 7"><use href="#pair"/></svg>
+      </svg>
+    </div>
+    <div class="hh-sec t-sec">People on this scale</div>
+    <div class="group">
+      <div class="hrow"><div class="g"><svg width="36" height="36" viewBox="0 0 120 120"><use href="#pair"/></svg></div><div class="k"><b class="t-body" style="font-weight:600">Sam</b><span class="t-meta">This phone · P1</span></div><svg class="ic chev" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></div>
+      <div class="hrow sub"><div class="g"></div><div class="k"><span class="t-body">Height</span></div><span class="t-body tnum" style="color:var(--crayon);font-weight:600">180 cm</span></div>
+      <div class="hrow"><div class="g"><svg width="31" height="31" viewBox="0 0 120 120"><use href="#pair"/></svg></div><div class="k"><b class="t-body" style="font-weight:600">Lien</b><span class="t-meta">Her phone · P2</span></div><svg class="ic chev" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></div>
+      <div class="hrow"><div class="g"><svg width="22" height="22" viewBox="0 0 120 120"><use href="#pair"/></svg></div><div class="k"><b class="t-body" style="font-weight:600">Mats</b><span class="t-meta">Guest · 2 readings, not in Health</span></div><svg class="ic chev" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></div>
+      <div class="hrow"><div class="k"><span class="t-body">Show everyone's numbers</span></div><div class="switch" data-system></div></div>
+    </div>
+    <div class="hh-sec t-sec">Scales</div>
+    <div class="group">
+      <div class="hrow"><div class="g"><svg width="34" height="34" viewBox="0 0 36 36" filter="url(#crayon)"><use href="#scaleglyph"/></svg></div><div class="k"><b class="t-body" style="font-weight:600">BS 650 · bathroom</b><span class="t-meta tnum">Paired · last seen 07:12</span></div></div>
+      <div class="hrow"><div class="g"><svg width="34" height="34" viewBox="0 0 36 36" filter="url(#crayon)"><use href="#boardglyph"/></svg></div><div class="k"><b class="t-body" style="font-weight:600">Workbench scale</b><span class="t-meta tnum">DIY ESP32 · battery 81%</span></div></div>
+      <div class="hrow"><div class="g"></div><div class="k"><span class="t-body" style="color:var(--ink2)">Scale forgot you? Teach it again</span></div><svg class="ic chev" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></div>
+      <div class="hrow"><div class="g"></div><div class="k"><span class="t-body" style="color:var(--ink2)">Forget the BS 650</span></div></div>
+    </div>
+    <div class="hh-sec t-sec">Apple Health</div>
+    <div class="group">
+      <div class="hrow"><div class="g"><svg class="tick" width="26" height="26" viewBox="0 0 24 24"><path d="M4.5 12.8c1.6 1.2 3 2.6 4.3 4.4C11 12.4 14.6 8.6 19.6 5.6"/></svg></div><div class="k"><span class="t-body">Connected</span></div><span class="t-body" style="color:var(--crayon);font-weight:600">Re-sync all</span></div>
+    </div>
+    <div class="t-meta" style="color:var(--ink2);margin:12px 0 120px">Re-sync writes your readings to Apple Health again and replaces what's there. Shake the phone for the scale clock, VitaDock import and the Bluetooth log.</div>
+  </div>
+  <div class="tabbar glass" data-system>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M9 5c2.4 0 3 3 3 6.5S11 19 8.6 19 6 15.5 6 12s.6-7 3-7zM16.5 8c1.7 0 2.5 1.8 2.5 4.5s-.8 5-2.5 5S14 15 14 12.5 14.8 8 16.5 8z"/></svg>Now</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M3.5 16.5c2.6-.6 3.6-6 6.6-6s2.8 4.8 5.6 4.2c2.6-.6 3-5.6 4.8-7.2"/></svg>Trends</div>
+    <div class="tab on"><svg class="ic" viewBox="0 0 24 24"><path d="M4 11.2 12 4.5l8 6.7V20H4z"/><path d="M10 20v-5h4v5"/></svg>Household</div>
+  </div>
+</section>
+
+<!-- 9 · Icon: two paper footprints on a cobalt scale, seen from above -->
+<section class="app-icon" data-name="icon">
+  <svg width="344" height="344" viewBox="0 0 344 344"><use href="#iconart"/></svg>
+</section>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="iconart" viewBox="0 0 344 344">
+    <rect width="344" height="344" fill="#F6F7F2"/>
+    <path d="M72 46c66-6 134-6 200 0 18 2 26 10 28 28 5 66 5 130 0 196-2 18-10 26-28 28-66 6-134 6-200 0-18-2-26-10-28-28-5-66-5-130 0-196 2-18 10-26 28-28z" fill="#2A39C4"/>
+    <rect x="146" y="68" width="52" height="20" rx="6" fill="#F6F7F2" opacity=".9"/>
+    <g fill="#F6F7F2">
+      <g transform="translate(96 104) rotate(-7 34 80) scale(.68)">
+        <path d="M50 226c-20 0-28-20-26-42 2-20-6-46-4-74 1-22 8-40 24-44 17-4 36 0 41 18 4 16-6 32-12 46-6 15 0 30 0 50 0 30-8 46-23 46z"/>
+        <circle cx="74" cy="44" r="13"/><circle cx="54" cy="33" r="9"/><circle cx="39" cy="37" r="8"/><circle cx="27" cy="47" r="7"/><circle cx="19" cy="60" r="6"/>
+      </g>
+      <g transform="translate(248 98) scale(-1 1) rotate(-5 34 80) scale(.68)">
+        <path d="M50 226c-20 0-28-20-26-42 2-20-6-46-4-74 1-22 8-40 24-44 17-4 36 0 41 18 4 16-6 32-12 46-6 15 0 30 0 50 0 30-8 46-23 46z"/>
+        <circle cx="74" cy="44" r="13"/><circle cx="54" cy="33" r="9"/><circle cx="39" cy="37" r="8"/><circle cx="27" cy="47" r="7"/><circle cx="19" cy="60" r="6"/>
+      </g>
+    </g>
+  </symbol>
+</defs></svg>
+
+<script>
+/* The scale's own seven-segment digits, drawn in crayon, for the "hunting" frame. */
+const SEG={0:"abcdef",1:"bc",2:"abged",3:"abgcd",4:"fgbc",5:"afgcd",6:"afgedc",7:"abc",8:"abcdefg",9:"abcdfg"};
+function segSVG(str,h){const w=h*.5,t=h*.09,g=t*.35;let x=0,o="";const P=a=>a.map(p=>p.join(",")).join(" ");
+ const S=ox=>{const L=ox,R=ox+w,M=h/2,B=h;return{a:[[L+t,g],[R-t,g],[R-t*1.6,t+g],[L+t*1.6,t+g]],d:[[L+t*1.6,B-t-g],[R-t*1.6,B-t-g],[R-t,B-g],[L+t,B-g]],g:[[L+t,M],[L+t*1.6,M-t/2],[R-t*1.6,M-t/2],[R-t,M],[R-t*1.6,M+t/2],[L+t*1.6,M+t/2]],f:[[L,t+g],[L+t,t*1.6+g],[L+t,M-t*.6],[L,M-t*.1]],e:[[L,M+t*.1],[L+t,M+t*.6],[L+t,B-t*1.6-g],[L,B-t-g]],b:[[R,t+g],[R,M-t*.1],[R-t,M-t*.6],[R-t,t*1.6+g]],c:[[R,M+t*.1],[R,B-t-g],[R-t,B-t*1.6-g],[R-t,M+t*.6]]}};
+ for(const ch of str){if(ch===","){o+=`<rect x="${x}" y="${h-t}" width="${t}" height="${t}" rx="2" style="fill:var(--crayon)"/><path d="M${x+t*.75} ${h-t*.3}l${-t*.45} ${t*1.5}" style="stroke:var(--crayon);stroke-width:${t*.8};stroke-linecap:round"/>`;x+=t*2.2;continue}
+  const s=S(x),on=SEG[ch];for(const k of "abcdefg")o+=`<polygon points="${P(s[k])}" style="fill:${on.includes(k)?"var(--crayon)":"var(--wash)"}"/>`;x+=w+t*1.2}
+ return `<svg width="${x}" height="${h}" viewBox="0 0 ${x} ${h}" style="display:block;transform:skewX(-4deg);margin-bottom:2px;overflow:visible">${o}</svg>`}
+/* Fill every data-clone target with the Now template, then apply per-frame state. */
+const tpl=document.getElementById("now-tpl").innerHTML;
+document.querySelectorAll("[data-clone=now]").forEach(el=>{
+  el.innerHTML=tpl;
+  if(el.dataset.num){el.querySelector(".n").textContent=el.dataset.num}
+  if(el.dataset.lcd){el.querySelector(".n").innerHTML=segSVG(el.dataset.lcd,90)}
+  if(el.dataset.comp){el.querySelector(".comp .head span").textContent=el.dataset.comp}
+});
+document.querySelectorAll("template-slot[data-clone-inner=now]").forEach(el=>{
+  const d=document.createElement("div");d.innerHTML=tpl;d.style.cssText="position:absolute;inset:0";el.replaceWith(d);
+});
+</script>
+<script src="kit/device.js"></script>
+</body></html>

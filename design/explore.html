@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Voetencomputer — three directions</title>
+<link rel="stylesheet" href="kit/device.css">
+<style>
+svg.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;flex:none}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ───────── A · the scale's own LCD at 7 a.m. (object / dark / seven-segment / teal / shape) ───────── */
+.a{--ground:#0A0D0E;--panel:#030505;--ink:#E9F1EF;--ink2:#9DB0AC;--ink3:#7D918D;--lit:#7BEAD5;--ghost:rgba(123,234,213,.08);--ito:rgba(160,200,195,.07);--rule:rgba(233,241,239,.12);
+  background:var(--ground);color:var(--ink)}
+.a .body{position:absolute;inset:calc(var(--safe-top) + 52px) 0 0;display:flex;flex-direction:column;padding:0 16px}
+.a .tb{position:absolute;top:var(--safe-top);left:16px;right:16px;height:44px;display:flex;justify-content:space-between;align-items:center}
+.a .pill{height:44px;border-radius:22px;padding:0 16px;display:flex;align-items:center;gap:8px;font:600 15px/1 var(--sf)}
+.a .lcd{background:var(--panel);border-radius:18px;padding:22px 20px 18px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.a .lcd .top{display:flex;justify-content:space-between;font:500 13px/16px var(--sf-mono);color:var(--ink2);letter-spacing:.5px}
+.a .lcd .top b{color:var(--lit);font-weight:500}
+.a .unit{font:600 22px/1 var(--sf);color:var(--lit);margin-left:6px;align-self:flex-end;margin-bottom:8px}
+.a .say{font:400 17px/23px var(--sf);margin:20px 4px 0;color:var(--ink)}
+.a .say em{font-style:normal;color:var(--lit)}
+.a .pads{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+.a .pad{background:var(--ito);border-radius:14px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:6px;min-height:92px;box-shadow:inset 0 0 0 1px rgba(160,200,195,.10)}
+.a .pad .l{font:500 13px/16px var(--sf);color:var(--ink2)}
+.a .pad .v{display:flex;align-items:flex-end;gap:4px}
+.a .pad .v span{font:500 13px/1 var(--sf);color:var(--ink2);margin-bottom:3px}
+.a .hh{margin-top:auto;margin-bottom:104px;font:400 15px/20px var(--sf);color:var(--ink2);display:flex;gap:10px;align-items:center;padding:0 4px}
+.a .tabbar{position:absolute;left:20px;right:20px;bottom:21px;height:62px;border-radius:31px;display:flex;align-items:center;justify-content:space-around;padding:0 6px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font:500 10px/12px var(--sf);width:96px;padding:7px 0 6px;border-radius:26px}
+.a .tab{color:var(--ink)}.a .tab.on{color:var(--lit);background:rgba(255,255,255,.08)}
+
+/* ───────── B · the nephew's drawing (play / light / rounded / ultramarine / illustration) ───────── */
+.b{--ground:#F6F7F2;--ink:#191B2C;--ink2:#4A4D63;--ink3:#6A6D82;--crayon:#2A39C4;--crayon-wash:rgba(42,57,196,.10);--rule:rgba(25,27,44,.12);
+  background:var(--ground);color:var(--ink);font-family:var(--sf-rounded)}
+.b .tb{position:absolute;top:var(--safe-top);left:16px;right:16px;height:44px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.b .pill{height:44px;border-radius:22px;padding:0 16px 0 6px;display:flex;align-items:center;gap:8px;font:600 15px/1 var(--sf-rounded)}
+.b .av{width:32px;height:32px;border-radius:16px;background:var(--crayon);color:#fff;display:grid;place-items:center;font:700 14px/1 var(--sf-rounded)}
+.b .body{position:absolute;inset:calc(var(--safe-top) + 52px) 0 0;display:flex;flex-direction:column;padding:0 20px}
+.b .date{font:600 15px/20px var(--sf-rounded);color:var(--ink2);margin-top:8px}
+.b .stage{position:relative;flex:1;min-height:0;max-height:330px;display:flex;align-items:flex-end}
+.b .stage svg.feet{position:absolute;right:-6px;top:6px;height:96%;width:auto}
+.b .num{position:relative;font:800 104px/0.9 var(--sf-rounded);letter-spacing:-4px;display:flex;align-items:flex-end;gap:6px}
+.b .num small{font:700 28px/1 var(--sf-rounded);letter-spacing:0;margin-bottom:12px;color:var(--ink2)}
+.b .say{font:500 20px/26px var(--sf-rounded);margin-top:16px;letter-spacing:-.2px}
+.b .say u{text-decoration:none;background:linear-gradient(transparent 62%,var(--crayon-wash) 62%)}
+.b .ok{display:flex;align-items:center;gap:8px;font:600 15px/20px var(--sf-rounded);color:var(--crayon);margin-top:10px}
+.b .comp{margin-top:28px}
+.b .bar{display:flex;height:30px;gap:3px}
+.b .bar div{border-radius:6px;border:2.5px solid var(--crayon)}
+.b .legend{display:flex;justify-content:space-between;margin-top:8px;font:500 13px/17px var(--sf-rounded);color:var(--ink2)}
+.b .legend b{display:block;font:700 17px/22px var(--sf-rounded);color:var(--ink)}
+.b .hh{margin-top:24px;margin-bottom:104px;font:500 15px/20px var(--sf-rounded);color:var(--ink2)}
+.b .tabbar{position:absolute;left:20px;right:20px;bottom:21px;height:62px;border-radius:31px;display:flex;align-items:center;justify-content:space-around;padding:0 6px}
+.b .tab{color:var(--ink);font-family:var(--sf-rounded)}.b .tab.on{color:var(--crayon);background:rgba(42,57,196,.08)}
+
+/* ───────── C · a 1974 bathroom floor (place / colour field / expanded / tile pink / colour-material) ───────── */
+.c{--ground:#E99A8F;--grout:#F9E6E0;--ink:#3A1210;--ink2:#5E2620;--glaze:#C9584B;--tile:rgba(255,255,255,.16);
+  background:var(--ground);color:var(--ink)}
+.c .floor{position:absolute;inset:0;background:
+  linear-gradient(90deg,var(--grout) 0 2px,transparent 2px) 0 0/67px 67px,
+  linear-gradient(0deg,var(--grout) 0 2px,transparent 2px) 0 0/67px 67px;opacity:.9}
+.c .tb{position:absolute;top:var(--safe-top);left:16px;right:16px;height:44px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.c .pill{height:44px;border-radius:22px;padding:0 16px;display:flex;align-items:center;gap:8px;font:600 15px/1 var(--sf);color:var(--ink)}
+.c .body{position:absolute;inset:calc(var(--safe-top) + 52px) 0 0;display:flex;flex-direction:column;padding:0 18px}
+.c .exp{font-family:var(--sf);font-stretch:150%}
+.c .date{font:700 13px/17px var(--sf);font-stretch:150%;letter-spacing:1.4px;text-transform:uppercase;margin-top:28px;color:var(--ink2)}
+.c .num{font-weight:900;font-size:104px;line-height:.92;letter-spacing:-5px;margin-top:10px;white-space:nowrap;font-stretch:130%}
+.c .num small{font-size:28px;letter-spacing:0;font-weight:800;font-stretch:150%}
+.c .say{font:500 19px/25px var(--sf);margin-top:18px;max-width:320px}
+.c .days{position:absolute;left:0;right:0;top:536px;display:grid;grid-template-columns:repeat(6,67px);grid-auto-rows:67px}
+.c .d{border-left:2px solid var(--grout);border-top:2px solid var(--grout)}
+.c .d{aspect-ratio:1;background:var(--ground);display:flex;flex-direction:column;justify-content:space-between;padding:9px 8px 7px 14px;position:relative;overflow:hidden}
+.c .d:after{content:"";position:absolute;left:-30%;top:-60%;width:90%;height:90%;background:radial-gradient(closest-side,rgba(255,255,255,.35),transparent);pointer-events:none}
+.c .d .w{font:700 11px/13px var(--sf);font-stretch:150%;letter-spacing:.6px;color:var(--ink2)}
+.c .d .v{font:800 17px/1 var(--sf);font-stretch:120%;font-variant-numeric:tabular-nums}
+.c .d.today{background:#8E2A22;color:#fff}.c .d.today .w{color:#FFE4DE}
+.c .d.miss .v{opacity:.0}
+.c .tabbar{position:absolute;left:20px;right:20px;bottom:21px;height:62px;border-radius:31px;display:flex;align-items:center;justify-content:space-around;padding:0 6px;--glass:rgba(255,236,230,.55)}
+.c .tab{color:var(--ink)}.c .tab.on{color:var(--ink);background:rgba(255,255,255,.45)}
+</style></head><body>
+
+<!-- ═════════════ A ═════════════ -->
+<section class="screen a" data-name="a-lcd" data-time="7:14" data-theme="dark">
+  <div class="tb">
+    <div class="pill glass">Sam <svg class="ic" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="pill glass" style="color:var(--lit)"><svg class="ic" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>In Health</div>
+  </div>
+  <div class="body">
+    <div class="lcd">
+      <div class="top"><span>SAT 17 OCT · 07:12</span><b>P1</b></div>
+      <div style="display:flex;align-items:flex-end;margin-top:18px"><span class="seg" data-v="78.4" data-h="118"></span><span class="unit">kg</span></div>
+    </div>
+    <p class="say">Half a kilo under Thursday. <em>Down 1,9 kg</em> since the end of July.</p>
+    <div class="pads">
+      <div class="pad"><span class="l">Body fat</span><div class="v"><span class="seg" data-v="18.4" data-h="34"></span><span>%</span></div></div>
+      <div class="pad"><span class="l">Muscle</span><div class="v"><span class="seg" data-v="40.1" data-h="34"></span><span>%</span></div></div>
+      <div class="pad"><span class="l">Water</span><div class="v"><span class="seg" data-v="57.9" data-h="34"></span><span>%</span></div></div>
+      <div class="pad"><span class="l">Bone</span><div class="v"><span class="seg" data-v="3.4" data-h="34"></span><span>kg</span></div></div>
+    </div>
+    <div class="hh"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.2.2 3.8 1.8 4.5 4.8"/></svg>Lien stepped on at 06:48 · sent to her phone</div>
+  </div>
+  <div class="tabbar glass" data-system>
+    <div class="tab on"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 8h6"/></svg>Now</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M4 17l5-5 4 3 7-8"/></svg>Trends</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg>Household</div>
+  </div>
+</section>
+
+<!-- ═════════════ B ═════════════ -->
+<section class="screen b" data-name="b-drawing" data-time="7:14">
+  <div class="tb">
+    <div class="pill glass"><span class="av">S</span>Sam</div>
+    <div class="pill glass" style="padding:0 14px;color:var(--crayon)"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div>
+  </div>
+  <div class="body">
+    <div class="date">Saturday, 07:12</div>
+    <div class="stage">
+      <svg class="feet" viewBox="0 0 240 300" aria-hidden="true">
+        <g fill="none" stroke="#2A39C4" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+          <g transform="translate(18 40) rotate(-6 50 130)">
+            <path d="M52 66c27-2 37 30 34 64-3 33-6 70-31 80-22 6-31-18-30-48 1-29-8-58-2-78 4-12 14-18 29-18z" fill="rgba(42,57,196,.10)"/>
+            <circle cx="66" cy="42" r="13"/><circle cx="44" cy="33" r="8.5"/><circle cx="29" cy="38" r="7.5"/><circle cx="18" cy="48" r="6.5"/><circle cx="11" cy="61" r="5.5"/>
+          </g>
+          <g transform="translate(222 18) scale(-1 1) rotate(-4 50 130)">
+            <path d="M52 66c27-2 37 30 34 64-3 33-6 70-31 80-22 6-31-18-30-48 1-29-8-58-2-78 4-12 14-18 29-18z" fill="rgba(42,57,196,.10)"/>
+            <circle cx="66" cy="42" r="13"/><circle cx="44" cy="33" r="8.5"/><circle cx="29" cy="38" r="7.5"/><circle cx="18" cy="48" r="6.5"/><circle cx="11" cy="61" r="5.5"/>
+          </g>
+        </g>
+      </svg>
+      <div class="num tnum">78,4<small>kg</small></div>
+    </div>
+    <div class="say">Half a kilo lighter than <u>Thursday</u>.</div>
+    <div class="ok"><svg class="ic" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg>In Apple Health</div>
+    <div class="comp">
+      <div class="bar">
+        <div style="flex:18.4;background:var(--crayon)"></div>
+        <div style="flex:40.1;background:repeating-linear-gradient(135deg,var(--crayon) 0 2.5px,transparent 2.5px 7px)"></div>
+        <div style="flex:4.3;background:var(--crayon-wash)"></div>
+        <div style="flex:37.2"></div>
+      </div>
+      <div class="legend"><span><b class="tnum">18,4%</b>fat</span><span><b class="tnum">40,1%</b>muscle</span><span><b class="tnum">3,4 kg</b>bone</span><span style="text-align:right"><b class="tnum">57,9%</b>water</span></div>
+    </div>
+    <div class="hh">Lien stepped on at 06:48. Her numbers went to her phone.</div>
+  </div>
+  <div class="tabbar glass" data-system>
+    <div class="tab on"><svg class="ic" viewBox="0 0 24 24"><path d="M8 4c3 0 4 3 4 7s-1 9-4 9-3-4-3-8 0-8 3-8zM17 7c2 0 3 2 3 5s-1 6-3 6-2-3-2-6 0-5 2-5z"/></svg>Now</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M3.5 16c3-1 4-6 7-6s3 5 6 4 3-6 4-7"/></svg>Trends</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg>Household</div>
+  </div>
+</section>
+
+<!-- ═════════════ C ═════════════ -->
+<section class="screen c" data-name="c-tiles" data-time="7:14">
+  <div class="floor"></div>
+  <div class="tb">
+    <div class="pill glass" style="--glass:rgba(255,236,230,.55)">Sam</div>
+    <div class="pill glass" style="--glass:rgba(255,236,230,.55)"><svg class="ic" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Health</div>
+  </div>
+  <div class="body">
+    <div class="date">Saturday 17 October, 07:12</div>
+    <div class="num exp tnum">78,4<small> kg</small></div>
+    <div class="say">Half a kilo under Thursday. Fat 18,4%, muscle 40,1%, water 57,9%.</div>
+    <div class="days">
+      <div class="d"><span class="w">SU</span><span class="v">79,1</span></div>
+      <div class="d"><span class="w">MO</span><span class="v">79,0</span></div>
+      <div class="d miss"><span class="w">TU</span><span class="v">–</span></div>
+      <div class="d"><span class="w">WE</span><span class="v">78,7</span></div>
+      <div class="d"><span class="w">TH</span><span class="v">78,9</span></div>
+      <div class="d miss"><span class="w">FR</span><span class="v">–</span></div>
+      <div class="d"><span class="w">SA</span><span class="v">78,8</span></div>
+      <div class="d"><span class="w">SU</span><span class="v">78,6</span></div>
+      <div class="d"><span class="w">MO</span><span class="v">78,9</span></div>
+      <div class="d"><span class="w">TU</span><span class="v">78,5</span></div>
+      <div class="d miss"><span class="w">WE</span><span class="v">–</span></div>
+      <div class="d today"><span class="w">SA</span><span class="v">78,4</span></div>
+    </div>
+  </div>
+  <div class="tabbar glass" data-system>
+    <div class="tab on"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 4v16M4 12h16"/></svg>Now</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M4 17l5-5 4 3 7-8"/></svg>Trends</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg>Household</div>
+  </div>
+</section>
+
+<script>
+/* Seven-segment numerals, drawn like the BS 650's own LCD: unlit segments stay faintly visible. */
+const SEG={0:"abcdef",1:"bc",2:"abged",3:"abgcd",4:"fgbc",5:"afgcd",6:"afgedc",7:"abc",8:"abcdefg",9:"abcdfg"};
+function segSVG(str,h){
+  const w=h*.5,t=h*.085,g=t*.35,sk=.08;let x=0,out="";
+  const poly=(pts)=>pts.map(p=>p.join(",")).join(" ");
+  const shapes=(ox)=>{const L=ox,R=ox+w,T=0,M=h/2,B=h;return{
+    a:[[L+t,T],[R-t,T],[R-t*1.6,T+t],[L+t*1.6,T+t]].map(p=>[p[0],p[1]+g]),
+    d:[[L+t*1.6,B-t],[R-t*1.6,B-t],[R-t,B],[L+t,B]].map(p=>[p[0],p[1]-g]),
+    g:[[L+t,M],[L+t*1.6,M-t/2],[R-t*1.6,M-t/2],[R-t,M],[R-t*1.6,M+t/2],[L+t*1.6,M+t/2]],
+    f:[[L,T+t],[L+t,T+t*1.6],[L+t,M-t*.6],[L,M-t*.1]].map(p=>[p[0],p[1]+g]),
+    e:[[L,M+t*.1],[L+t,M+t*.6],[L+t,B-t*1.6],[L,B-t]].map(p=>[p[0],p[1]-g]),
+    b:[[R,T+t],[R,M-t*.1],[R-t,M-t*.6],[R-t,T+t*1.6]].map(p=>[p[0],p[1]+g]),
+    c:[[R,M+t*.1],[R,B-t],[R-t,B-t*1.6],[R-t,M+t*.6]].map(p=>[p[0],p[1]-g])}};
+  for(const ch of str){
+    if(ch==="."||ch===","){out+=`<rect x="${x-t*.2}" y="${h-t}" width="${t}" height="${t}" rx="${t*.2}" style="fill:var(--lit)"/>`;x+=t*1.4;continue}
+    const s=shapes(x),on=SEG[ch]||"";
+    for(const k of "abcdefg")out+=`<polygon points="${poly(s[k])}" style="fill:${on.includes(k)?"var(--lit)":"var(--ghost)"}"/>`;
+    x+=w+t*1.1;
+  }
+  return `<svg width="${x}" height="${h}" viewBox="0 0 ${x} ${h}" style="display:block;transform:skewX(-${sk*45}deg);overflow:visible">${out}</svg>`;
+}
+document.querySelectorAll(".seg").forEach(e=>{e.innerHTML=segSVG(e.dataset.v,+e.dataset.h);e.setAttribute("aria-label",e.dataset.v)});
+</script>
+<script src="kit/device.js"></script>
+</body></html>

@@ -1,0 +1,100 @@
+[
+  {
+    "name": "before-now",
+    "fails": [
+      "Contrast below WCAG on solid ground: 2.08:1 54px \"78,4 kg\"; 2.08:1 13px \"▼ 0,5 kg since last\"; 3.35:1 13px \"17 Oct 2026 at 07:12\"; 3.35:1 12px \"Sam\"; 3.42:1 12px \"In Apple Health\"",
+      "7 saturated hue families (144°, 0°, 24°, 168°, 192°, 216°, 240°). One accent, maybe one semantic colour. This is confetti."
+    ],
+    "warns": [],
+    "facts": {
+      "fonts": {
+        "SF Pro": 17,
+        "SF Pro Rounded": 1
+      },
+      "sizes": [
+        54,
+        34,
+        20,
+        13,
+        12,
+        11
+      ],
+      "weights": [
+        "400",
+        "600",
+        "700"
+      ],
+      "leftEdges": 5,
+      "accentHues": [
+        144,
+        0,
+        24,
+        168,
+        192,
+        216,
+        240
+      ],
+      "cards": 5
+    }
+  },
+  {
+    "name": "before-trends",
+    "fails": [
+      "Contrast below WCAG on solid ground: 2.11:1 15px \"Weight\"; 3.38:1 12px \"−1,9 kg in 90 days\"; 2.10:1 15px \"Body fat\"; 3.38:1 12px \"−0,8% in 90 days\"; 2.01:1 15px \"Muscle\""
+    ],
+    "warns": [
+      "Three saturated hue families (144°, 24°, 168°). Is each one earning its place?"
+    ],
+    "facts": {
+      "fonts": {
+        "SF Pro": 10
+      },
+      "sizes": [
+        34,
+        20,
+        15,
+        12
+      ],
+      "weights": [
+        "400",
+        "600",
+        "700"
+      ],
+      "leftEdges": 2,
+      "accentHues": [
+        144,
+        24,
+        168
+      ],
+      "cards": 3
+    }
+  },
+  {
+    "name": "before-settings",
+    "fails": [
+      "Contrast below WCAG on solid ground: 3.30:1 13px \"Apple Health\"; 2.22:1 17px \"Connected to Apple Health\"; 4.02:1 17px \"Re-sync all measurements\"; 3.30:1 13px \"Re-sync writes all of your measurements \"; 3.30:1 13px \"Me\""
+    ],
+    "warns": [],
+    "facts": {
+      "fonts": {
+        "SF Pro": 16
+      },
+      "sizes": [
+        34,
+        17,
+        13,
+        12
+      ],
+      "weights": [
+        "400",
+        "700"
+      ],
+      "leftEdges": 3,
+      "accentHues": [
+        144,
+        216
+      ],
+      "cards": 3
+    }
+  }
+]

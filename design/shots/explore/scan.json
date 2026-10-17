@@ -1,0 +1,95 @@
+[
+  {
+    "name": "a-lcd",
+    "fails": [],
+    "warns": [
+      "Largest text is 22px. No element owns the screen. (Mark data-dense if this is deliberate.)",
+      "7 elements cast shadows. Depth should come from one or two layers, not every tile."
+    ],
+    "facts": {
+      "fonts": {
+        "SF Pro": 14,
+        "SF Mono": 2
+      },
+      "sizes": [
+        22,
+        17,
+        15,
+        13
+      ],
+      "weights": [
+        "400",
+        "500",
+        "600"
+      ],
+      "leftEdges": 4,
+      "accentHues": [
+        168
+      ],
+      "cards": 5
+    }
+  },
+  {
+    "name": "b-drawing",
+    "fails": [],
+    "warns": [],
+    "facts": {
+      "fonts": {
+        "SF Pro Rounded": 17
+      },
+      "sizes": [
+        104,
+        28,
+        20,
+        17,
+        15,
+        14,
+        13
+      ],
+      "weights": [
+        "500",
+        "600",
+        "700",
+        "800"
+      ],
+      "leftEdges": 3,
+      "accentHues": [
+        240
+      ],
+      "cards": 0
+    }
+  },
+  {
+    "name": "c-tiles",
+    "fails": [],
+    "warns": [
+      "Text within 12pt of the screen edge: 4px \"78,4\""
+    ],
+    "facts": {
+      "fonts": {
+        "SF Pro": 27
+      },
+      "sizes": [
+        104,
+        28,
+        19,
+        17,
+        15,
+        13,
+        11
+      ],
+      "weights": [
+        "500",
+        "600",
+        "700",
+        "800",
+        "900"
+      ],
+      "leftEdges": 3,
+      "accentHues": [
+        0
+      ],
+      "cards": 0
+    }
+  }
+]

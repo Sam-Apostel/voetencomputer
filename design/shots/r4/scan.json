@@ -1,0 +1,232 @@
+[
+  {
+    "name": "now",
+    "fails": [],
+    "warns": [],
+    "facts": {
+      "fonts": {
+        "SF Pro Rounded": 19
+      },
+      "sizes": [
+        104,
+        28,
+        20,
+        17,
+        15,
+        13
+      ],
+      "weights": [
+        "500",
+        "600",
+        "700",
+        "800"
+      ],
+      "leftEdges": 4,
+      "accentHues": [
+        240
+      ],
+      "cards": 0
+    }
+  },
+  {
+    "name": "body",
+    "fails": [],
+    "warns": [
+      "Text inside the system's safe areas: \"Water\" (home indicator); \"overlaps muscle, so it's\" (home indicator); \"57,9%\" (home indicator)"
+    ],
+    "facts": {
+      "fonts": {
+        "SF Pro Rounded": 26
+      },
+      "sizes": [
+        34,
+        20,
+        17,
+        15,
+        13
+      ],
+      "weights": [
+        "400",
+        "500",
+        "600",
+        "700"
+      ],
+      "leftEdges": 2,
+      "accentHues": [
+        240
+      ],
+      "cards": 0
+    }
+  },
+  {
+    "name": "trends",
+    "fails": [],
+    "warns": [
+      "Only 3 text sizes across 23 text elements. Hierarchy is flat."
+    ],
+    "facts": {
+      "fonts": {
+        "SF Pro Rounded": 23
+      },
+      "sizes": [
+        34,
+        17,
+        13
+      ],
+      "weights": [
+        "400",
+        "500",
+        "600",
+        "700"
+      ],
+      "leftEdges": 3,
+      "accentHues": [
+        240
+      ],
+      "cards": 0
+    }
+  },
+  {
+    "name": "signature",
+    "fails": [],
+    "warns": [
+      "Only 3 text sizes across 10 text elements. Hierarchy is flat."
+    ],
+    "facts": {
+      "fonts": {
+        "SF Pro Rounded": 10
+      },
+      "sizes": [
+        34,
+        15,
+        13
+      ],
+      "weights": [
+        "500",
+        "700"
+      ],
+      "leftEdges": 1,
+      "accentHues": [
+        240
+      ],
+      "cards": 0
+    }
+  },
+  {
+    "name": "now-dark",
+    "fails": [],
+    "warns": [],
+    "facts": {
+      "fonts": {
+        "SF Pro Rounded": 19
+      },
+      "sizes": [
+        104,
+        28,
+        20,
+        17,
+        15,
+        13
+      ],
+      "weights": [
+        "500",
+        "600",
+        "700",
+        "800"
+      ],
+      "leftEdges": 4,
+      "accentHues": [
+        240
+      ],
+      "cards": 0
+    }
+  },
+  {
+    "name": "who",
+    "fails": [],
+    "warns": [
+      "3 gradients. Gradients are a seasoning, not a surface treatment."
+    ],
+    "facts": {
+      "fonts": {
+        "SF Pro Rounded": 30
+      },
+      "sizes": [
+        104,
+        34,
+        28,
+        20,
+        17,
+        15,
+        13
+      ],
+      "weights": [
+        "400",
+        "500",
+        "600",
+        "700",
+        "800"
+      ],
+      "leftEdges": 5,
+      "accentHues": [
+        240
+      ],
+      "cards": 1
+    }
+  },
+  {
+    "name": "first-run",
+    "fails": [],
+    "warns": [],
+    "facts": {
+      "fonts": {
+        "SF Pro Rounded": 7
+      },
+      "sizes": [
+        34,
+        17,
+        15
+      ],
+      "weights": [
+        "400",
+        "500",
+        "600",
+        "700"
+      ],
+      "leftEdges": 2,
+      "accentHues": [
+        240
+      ],
+      "cards": 0
+    }
+  },
+  {
+    "name": "household",
+    "fails": [],
+    "warns": [
+      "Text inside the system's safe areas: \"Forget the BS 650\" (home indicator)"
+    ],
+    "facts": {
+      "fonts": {
+        "SF Pro Rounded": 18
+      },
+      "sizes": [
+        34,
+        17,
+        15,
+        13
+      ],
+      "weights": [
+        "400",
+        "500",
+        "600",
+        "700"
+      ],
+      "leftEdges": 2,
+      "accentHues": [
+        240
+      ],
+      "cards": 0
+    }
+  }
+]
