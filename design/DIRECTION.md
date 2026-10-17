@@ -89,7 +89,7 @@ The keep column is a contract. Each item is checked against the final screens.
 
 Every product-changing call in this redesign. None is built; each is a yes/no for you.
 
-1. **Name.** Keep **Voetencomputer** as the App Store name, subtitle "Your scale, straight to Apple Health". The drawing direction depends on the story. But the home-screen label truncates at about 12 characters ("Voetencompu…"): either accept that, or set the display name to **Voeten**. ScaleSync stays the internal target name only. Recommendation: Voetencomputer on the Store, Voeten on the home screen.
+1. **Name.** *Decided by Sam: Voetencomputer everywhere, including the home screen.* App Store subtitle "Your scale, straight to Apple Health". The drawing direction depends on the name's story. (The home-screen label may truncate on some phones; that is accepted.) ScaleSync stays the internal target name only.
 2. **Drop the VitaDock palette.** `MetricColor` (picked after household feedback that the app felt flat) is replaced by one crayon colour, with metrics told apart by fill: solid, hatched, washed, empty. The app gets *more* colourful in feel (the drawings) while using one hue. This reverses a choice someone in the household asked for; worth showing them the before/after first.
 3. **Donut → one bar.** Same data and the same disjoint-compartment model, drawn as a single crayon bar that reads left to right.
 4. **Tabs: Now · Trends · Household** (was Now · Trends · Settings). People and scales lead; Apple Health and the advanced rows live under them.

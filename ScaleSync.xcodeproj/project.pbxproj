@@ -271,7 +271,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScaleSync/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Voeten;
+				INFOPLIST_KEY_CFBundleDisplayName = Voetencomputer;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Voetencomputer connects to your bathroom scale over Bluetooth: a Medisana BS 4xx/6xx or a DIY scale on the standard Weight Scale Service.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Voetencomputer reads your weight and body composition history from Apple Health to show your trends.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Voetencomputer saves your weight and body composition to Apple Health.";
@@ -309,7 +309,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScaleSync/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Voeten;
+				INFOPLIST_KEY_CFBundleDisplayName = Voetencomputer;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Voetencomputer connects to your bathroom scale over Bluetooth: a Medisana BS 4xx/6xx or a DIY scale on the standard Weight Scale Service.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Voetencomputer reads your weight and body composition history from Apple Health to show your trends.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Voetencomputer saves your weight and body composition to Apple Health.";
