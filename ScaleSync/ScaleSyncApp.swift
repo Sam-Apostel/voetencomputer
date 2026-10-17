@@ -13,6 +13,7 @@ struct ScaleSyncApp: App {
     @StateObject private var health: HealthSync
     @StateObject private var scaleManager: ScaleManager
     @AppStorage("showAdvancedSettings") private var showAdvancedSettings = false
+    @State private var tab = 0
 
     init() {
         let container: ModelContainer
@@ -36,22 +37,31 @@ struct ScaleSyncApp: App {
         _health = StateObject(wrappedValue: health)
         _scaleManager = StateObject(wrappedValue: ScaleManager(modelContainer: container, health: health))
         ScaleNotifications.configure()
+        #if DEBUG
+        DemoData.applyLaunchArguments(container: container)
+        _tab = State(initialValue: DemoData.initialTab)
+        #endif
     }
 
     var body: some Scene {
         WindowGroup {
-            TabView {
-                DashboardView()
-                    .tabItem { Label("Now", systemImage: "scalemass") }
-                TrendsView()
-                    .tabItem { Label("Trends", systemImage: "chart.xyaxis.line") }
-                SettingsView()
-                    .tabItem { Label("Settings", systemImage: "gearshape") }
+            TabView(selection: $tab) {
+                Tab("Now", systemImage: "shoeprints.fill", value: 0) { NowView() }
+                Tab("Trends", systemImage: "chart.line.uptrend.xyaxis", value: 1) { TrendsView() }
+                Tab("Household", systemImage: "house", value: 2) { HouseholdView() }
             }
+            .tint(.crayon)
+            .fontDesign(.rounded)
+            .foregroundStyle(.ink)
             .environmentObject(health)
             .environmentObject(scaleManager)
-            .task { ScaleNotifications.requestAuthorization() }
-            // Shaking shows or hides the Advanced section in Settings.
+            .task {
+                #if DEBUG
+                if DemoData.isActive { return }
+                #endif
+                ScaleNotifications.requestAuthorization()
+            }
+            // Shaking shows or hides the Advanced section in Household.
             .onReceive(NotificationCenter.default.publisher(for: UIDevice.deviceDidShake)) { _ in
                 showAdvancedSettings.toggle()
             }

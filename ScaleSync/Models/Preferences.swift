@@ -51,6 +51,6 @@ enum UserProfiles {
     static func displayName(slot: Int, json: String? = nil) -> String {
         if slot == 0 { return "All users" }
         let names = decode(json ?? UserDefaults.standard.string(forKey: defaultsKey) ?? "{}")
-        return names[slot] ?? "User \(slot)"
+        return names[slot] ?? (Household.isGuest(slot) ? "Guest" : "P\(slot)")
     }
 }

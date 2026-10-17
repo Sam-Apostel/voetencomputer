@@ -7,9 +7,10 @@ Protocol: **Bluetooth SIG Weight Scale Service (0x181D)** — the open standard,
 Medisana's proprietary layout. Doing it this way means the scale also works with other
 standards-compliant apps.
 
-> **Status:** the app currently speaks only the Medisana protocol. 0x181D support is on
-> Sam's side and not built yet. Build and test the firmware against a generic BLE tool
-> (nRF Connect) first — app support lands after.
+> **Status:** the app pairs with 0x181D scales (Household → Add a scale, or automatically
+> on first run), parses 0x2A9D including the optional time stamp and user id, and reads the
+> battery level. It has not been tested against real hardware yet, so build and test the
+> firmware against a generic BLE tool (nRF Connect) first.
 
 ---
 

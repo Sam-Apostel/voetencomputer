@@ -96,3 +96,19 @@ private final class NotificationDelegate: NSObject, UNUserNotificationCenterDele
         await MainActor.run { RecognitionHelp.request(slot: slot) }
     }
 }
+
+extension ScaleNotifications {
+    /// The receipt after a normal weigh-in (DIRECTION.md decision 8): the
+    /// phone is usually in a pocket, so this is the app's real first screen.
+    /// Replaces the previous one instead of stacking up.
+    static func postConfirmation(weightKg: Double, inHealth: Bool, change: String?) {
+        let content = UNMutableNotificationContent()
+        let weight = Units.weightString(weightKg)
+        content.body = [inHealth ? "\(weight), in Apple Health." : "\(weight), saved.", change]
+            .compactMap { $0 }
+            .joined(separator: " ")
+        content.interruptionLevel = .passive
+        UNUserNotificationCenter.current().add(
+            UNNotificationRequest(identifier: "weigh-in-receipt", content: content, trigger: nil))
+    }
+}

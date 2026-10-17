@@ -141,3 +141,48 @@ enum ScaleProtocol {
     /// weigh-in when merging weight + composition packets.
     static let mergeWindow: TimeInterval = 60
 }
+
+// MARK: - Bluetooth SIG Weight Scale Service (the DIY ESP32 scale)
+
+/// The open standard the DIY scale speaks (docs/esp32-scale-spec.md).
+enum WeightScaleGATT {
+    static let service = "181D"
+    static let measurementChar = "2A9D"   // indicate
+    static let featureChar = "2A9E"       // read
+    static let batteryService = "180F"
+    static let batteryLevelChar = "2A19"  // read + notify
+}
+
+enum WeightScaleProtocol {
+
+    /// 0x2A9D Weight Measurement. Flags: bit 0 imperial, bit 1 time stamp,
+    /// bit 2 user id, bit 3 BMI + height. SI weight is uint16 × 0.005 kg,
+    /// imperial uint16 × 0.01 lb. Without a time stamp the reading is live,
+    /// so it is stamped with `now`.
+    static func parseMeasurement(_ data: Data, now: Date = Date(),
+                                 calendar: Calendar = .current) -> WeightPacket? {
+        let b = [UInt8](data)
+        guard b.count >= 3 else { return nil }
+        let flags = b[0]
+        let raw = Double(UInt16(b[1]) | (UInt16(b[2]) << 8))
+        let weightKg = flags & 0x01 == 0 ? raw * 0.005 : raw * 0.01 * 0.45359237
+        guard weightKg > 2, weightKg < 400 else { return nil }
+        var i = 3
+        var date = now
+        if flags & 0x02 != 0 {
+            guard b.count >= i + 7 else { return nil }
+            let year = Int(UInt16(b[i]) | (UInt16(b[i + 1]) << 8))
+            var c = DateComponents()
+            c.year = year; c.month = Int(b[i + 2]); c.day = Int(b[i + 3])
+            c.hour = Int(b[i + 4]); c.minute = Int(b[i + 5]); c.second = Int(b[i + 6])
+            // Year 0 means "unknown" in the spec: keep the arrival time.
+            if year > 0, let d = calendar.date(from: c), d <= now.addingTimeInterval(48 * 3600) { date = d }
+            i += 7
+        }
+        var userId: Int?
+        if flags & 0x04 != 0, b.count > i {
+            userId = b[i] == 0xFF ? nil : Int(b[i])
+        }
+        return WeightPacket(weightKg: weightKg, date: date, userId: userId)
+    }
+}

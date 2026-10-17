@@ -77,9 +77,11 @@ final class HealthSync: ObservableObject {
             // users") means no profile is selected — then everything syncs,
             // matching the pre-profile behavior.
             let slot = UserDefaults.standard.integer(forKey: "myUserSlot")
+            // Guests (slots 101+) never go to Apple Health.
+            let firstGuest = Household.firstGuestSlot
             let predicate: Predicate<ScaleMeasurement> = slot > 0
                 ? #Predicate { $0.healthSynced == false && $0.weightKg > 0 && $0.userId == slot }
-                : #Predicate { $0.healthSynced == false && $0.weightKg > 0 }
+                : #Predicate { $0.healthSynced == false && $0.weightKg > 0 && $0.userId < firstGuest }
             guard let pending = try? context.fetch(FetchDescriptor(predicate: predicate)), !pending.isEmpty else {
                 completion?(.nothingToDo)
                 return
