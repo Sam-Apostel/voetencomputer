@@ -6,3 +6,15 @@ build/
 
 # macOS
 .DS_Store
+
+# fastlane
+vendor/
+fastlane/report.xml
+fastlane/README.md
+fastlane/test_output/
+*.p8
+*.ipa
+*.dSYM.zip
+*.mobileprovision
+*.cer
+.bundle/

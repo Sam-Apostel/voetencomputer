@@ -51,7 +51,9 @@ final class ScaleManager: NSObject, ObservableObject {
 
     @Published var status: ScaleStatus = .idle
     @Published var log: [BLELogLine] = []
-    @Published var scaleName: String?
+    /// Persisted through the saved peripheral identifier, so a relaunch doesn't
+    /// show "no scale" until the next weigh-in.
+    @Published private(set) var isPaired = false
     @Published var newReadingsThisSession = 0
 
     private var central: CBCentralManager!
@@ -60,6 +62,20 @@ final class ScaleManager: NSObject, ObservableObject {
     private var indicationsPending = 0
     private var syncWorkItem: DispatchWorkItem?
     private var serviceDiscoveryRetries = 0
+    /// After a background relaunch, both the restored pending connect and our
+    /// own reconnect report `didConnect` for the same link. Only the first one
+    /// may start service discovery, or every later step runs twice.
+    private var sessionStarted = false
+
+    private struct UnrecognizedWeighIn {
+        let weightKg: Double
+        let slot: Int?
+        let date: Date
+    }
+
+    /// Weigh-ins in the current connection that the scale couldn't assign to
+    /// a profile. Reported once, when the scale hangs up.
+    private var unrecognizedThisSession: [UnrecognizedWeighIn] = []
 
     /// The scale starts advertising the instant someone steps on it, so we
     /// connect at the *beginning* of a weigh-in. Two measured constraints
@@ -96,6 +112,7 @@ final class ScaleManager: NSObject, ObservableObject {
         self.modelContainer = modelContainer
         self.health = health
         super.init()
+        isPaired = knownPeripheralID != nil
         central = CBCentralManager(
             delegate: self,
             queue: .main,
@@ -123,7 +140,7 @@ final class ScaleManager: NSObject, ObservableObject {
         if let p = scale { central.cancelPeripheralConnection(p) }
         scale = nil
         knownPeripheralID = nil
-        scaleName = nil
+        isPaired = false
         appendLog("Forgot saved scale")
         connectOrScan()
     }
@@ -162,6 +179,11 @@ final class ScaleManager: NSObject, ObservableObject {
     }
 
     private func requestMeasurements(from peripheral: CBPeripheral) {
+        // Whichever path got here (scheduled or manual), the request is no
+        // longer pending — the disconnect handler relies on this to tell a
+        // premature hang-up apart from a normal one.
+        syncWorkItem?.cancel()
+        syncWorkItem = nil
         guard let cmd = commandCharacteristic else {
             peripheral.discoverServices([serviceUUID])
             return
@@ -180,12 +202,69 @@ final class ScaleManager: NSObject, ObservableObject {
             return
         }
         appendLog("← weight \(String(format: "%.2f", p.weightKg)) kg  user \(p.userId.map(String.init) ?? "–")  \(p.date.formatted())")
-        upsert(date: p.date, userId: p.userId ?? 0) { m in
-            m.weightKg = p.weightKg
+        recordWeight(p.weightKg, date: p.date, scaleUserId: p.userId)
+    }
+
+    /// Store a weight, falling back to matching by weight when the scale
+    /// itself didn't recognise who was standing on it.
+    private func recordWeight(_ weightKg: Double, date: Date, scaleUserId: Int?) {
+        var slot = scaleUserId
+        if scaleUserId == nil {
+            let match = ProfileMatcher.match(weightKg: weightKg, lastWeights: lastWeightPerProfile())
+            if let match {
+                appendLog("   scale recognised no one — matched to profile \(match) by weight")
+            } else {
+                appendLog("   scale recognised no one — no single profile within \(Int(ProfileMatcher.toleranceKg)) kg, left unassigned")
+            }
+            unrecognizedThisSession.append(UnrecognizedWeighIn(weightKg: weightKg, slot: match, date: date))
+            slot = match
+        }
+        let userId = slot ?? 0
+        upsert(date: date, userId: userId) { m in
+            m.weightKg = weightKg
         } create: {
-            ScaleMeasurement(date: p.date, userId: p.userId ?? 0, weightKg: p.weightKg)
+            ScaleMeasurement(date: date, userId: userId, weightKg: weightKg)
         }
     }
+
+    /// Most recent stored weight for each profile the scale has recognised.
+    private func lastWeightPerProfile() -> [Int: Double] {
+        MainActor.assumeIsolated {
+            let descriptor = FetchDescriptor<ScaleMeasurement>(
+                predicate: #Predicate { $0.userId > 0 && $0.weightKg > 0 },
+                sortBy: [SortDescriptor(\.date, order: .reverse)])
+            var latest: [Int: Double] = [:]
+            for m in (try? modelContainer.mainContext.fetch(descriptor)) ?? [] where latest[m.userId] == nil {
+                latest[m.userId] = m.weightKg
+            }
+            return latest
+        }
+    }
+
+    /// One notification per session, for the newest unrecognised weigh-in.
+    /// Older ones the scale re-sends from memory don't deserve a ping.
+    private func reportUnrecognizedWeighIns() {
+        defer { unrecognizedThisSession.removeAll() }
+        guard let newest = unrecognizedThisSession.max(by: { $0.date < $1.date }),
+              newest.date > Date().addingTimeInterval(-10 * 60) else { return }
+        if let slot = newest.slot {
+            RecognitionHelp.request(slot: slot)
+        }
+        ScaleNotifications.postUnrecognizedWeighIn(
+            weightKg: newest.weightKg,
+            slot: newest.slot,
+            ownSlot: UserDefaults.standard.integer(forKey: "myUserSlot"))
+    }
+
+    #if DEBUG
+    /// Runs an unrecognised weigh-in through the same path as a real one, to
+    /// check matching, the notification and the dashboard cards in the simulator.
+    func simulateUnrecognizedWeighIn(weightKg: Double) {
+        appendLog("(debug) simulated unrecognised weigh-in \(weightKg) kg")
+        recordWeight(weightKg, date: .now, scaleUserId: nil)
+        reportUnrecognizedWeighIns()
+    }
+    #endif
 
     private func handleComposition(_ data: Data) {
         guard let p = ScaleProtocol.parseComposition(data, epoch: epoch) else {
@@ -289,14 +368,15 @@ extension ScaleManager: CBCentralManagerDelegate {
         scale = peripheral
         peripheral.delegate = self
         knownPeripheralID = peripheral.identifier
-        scaleName = peripheral.name
+        isPaired = true
         status = .connecting
         central.connect(peripheral)
     }
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        guard !sessionStarted else { return }
+        sessionStarted = true
         appendLog("Connected to \(peripheral.name ?? "scale")")
-        scaleName = peripheral.name
         status = .syncing
         serviceDiscoveryRetries = 0
         peripheral.discoverServices([serviceUUID])
@@ -305,6 +385,7 @@ extension ScaleManager: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager,
                         didFailToConnect peripheral: CBPeripheral, error: Error?) {
         appendLog("Connect failed: \(error?.localizedDescription ?? "unknown")")
+        sessionStarted = false
         connectOrScan()
     }
 
@@ -317,6 +398,8 @@ extension ScaleManager: CBCentralManagerDelegate {
         syncWorkItem?.cancel()
         syncWorkItem = nil
         commandCharacteristic = nil
+        sessionStarted = false
+        reportUnrecognizedWeighIns()
         if case .syncing = status { status = .done(Date()) }
         // Re-arm the pending connect so the next weigh-in wakes us again.
         central.connect(peripheral)

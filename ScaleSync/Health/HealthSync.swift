@@ -2,8 +2,9 @@
 //  HealthSync.swift
 //  ScaleSync
 //
-//  Writes measurements into Apple Health. Uses HKMetadataKeySyncIdentifier so
-//  re-writing the same measurement replaces the sample instead of duplicating.
+//  Writes measurements into Apple Health and reads history back for Trends.
+//  Uses HKMetadataKeySyncIdentifier so re-writing the same measurement replaces
+//  the sample instead of duplicating it.
 //
 //  Mapped to HealthKit: weight, body fat %, lean body mass, BMI (if height set).
 //  Water %, muscle % and bone mass have no HealthKit types — those live in the
@@ -17,7 +18,16 @@ import SwiftData
 
 final class HealthSync: ObservableObject {
 
-    @Published var authorized = false
+    /// Whether the app may write weight to Health. Only write access can be
+    /// checked: HealthKit deliberately hides whether reading was allowed.
+    @Published private(set) var authorized = false
+
+    enum PushResult {
+        case saved(Int)
+        case nothingToDo
+        case failed(String)
+        case unavailable
+    }
 
     private let store = HKHealthStore()
 
@@ -32,19 +42,33 @@ final class HealthSync: ObservableObject {
         UserDefaults.standard.double(forKey: "heightCm")
     }
 
-    func requestAuthorization() {
+    init() {
+        refreshAuthorizationStatus()
+    }
+
+    func refreshAuthorizationStatus() {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        authorized = store.authorizationStatus(for: types.mass) == .sharingAuthorized
+    }
+
+    /// Asks for write and read access. iOS only shows the sheet for types not
+    /// decided yet, so this is cheap to call whenever access matters.
+    func requestAuthorization() async {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         let t = types
         let share: Set<HKSampleType> = [t.mass, t.fat, t.lean, t.bmi]
-        store.requestAuthorization(toShare: share, read: []) { [weak self] ok, _ in
-            DispatchQueue.main.async { self?.authorized = ok }
-        }
+        let read: Set<HKObjectType> = [t.mass, t.fat, t.lean, t.bmi]
+        try? await store.requestAuthorization(toShare: share, read: read)
+        refreshAuthorizationStatus()
     }
 
     /// Push every measurement not yet written to Health. Must be called from
     /// the main queue (all current call sites are).
-    func pushUnsynced(container: ModelContainer) {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
+    func pushUnsynced(container: ModelContainer, completion: (@MainActor (PushResult) -> Void)? = nil) {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            completion?(.unavailable)
+            return
+        }
         // ModelContext is not Sendable, so all context work stays inside the
         // closure; only the (Sendable) keys are captured by the completion.
         MainActor.assumeIsolated {
@@ -56,24 +80,30 @@ final class HealthSync: ObservableObject {
             let predicate: Predicate<ScaleMeasurement> = slot > 0
                 ? #Predicate { $0.healthSynced == false && $0.weightKg > 0 && $0.userId == slot }
                 : #Predicate { $0.healthSynced == false && $0.weightKg > 0 }
-            guard let pending = try? context.fetch(FetchDescriptor(predicate: predicate)), !pending.isEmpty else { return }
+            guard let pending = try? context.fetch(FetchDescriptor(predicate: predicate)), !pending.isEmpty else {
+                completion?(.nothingToDo)
+                return
+            }
 
+            // A version that grows with every write, so writing a measurement
+            // again replaces the sample in Health. With a fixed version Health
+            // keeps the old sample — corrected values (e.g. BMI after a height
+            // change) would never arrive.
+            let version = Int(Date().timeIntervalSince1970)
             var samples: [HKQuantitySample] = []
             var syncedKeys: [String] = []
-
             for m in pending {
-                samples.append(contentsOf: makeSamples(for: m))
+                samples.append(contentsOf: makeSamples(for: m, version: version))
                 syncedKeys.append(m.key)
             }
-            guard !samples.isEmpty else { return }
 
             store.save(samples) { ok, error in
-                guard ok else {
-                    print("HealthKit save failed: \(error?.localizedDescription ?? "?")")
-                    return
-                }
                 DispatchQueue.main.async {
                     MainActor.assumeIsolated {
+                        guard ok else {
+                            completion?(.failed(error?.localizedDescription ?? "unknown error"))
+                            return
+                        }
                         let ctx = container.mainContext
                         for key in syncedKeys {
                             let p = #Predicate<ScaleMeasurement> { $0.key == key }
@@ -82,6 +112,7 @@ final class HealthSync: ObservableObject {
                             }
                         }
                         try? ctx.save()
+                        completion?(.saved(syncedKeys.count))
                     }
                 }
             }
@@ -111,8 +142,8 @@ final class HealthSync: ObservableObject {
         }
     }
 
-    /// Force a re-push of everything (used after changing settings).
-    func resyncAll(container: ModelContainer) {
+    /// Write every measurement again, replacing what Health has.
+    func resyncAll(container: ModelContainer, completion: (@MainActor (PushResult) -> Void)? = nil) {
         MainActor.assumeIsolated {
             let context = container.mainContext
             if let all = try? context.fetch(FetchDescriptor<ScaleMeasurement>()) {
@@ -120,16 +151,29 @@ final class HealthSync: ObservableObject {
                 try? context.save()
             }
         }
-        pushUnsynced(container: container)
+        pushUnsynced(container: container, completion: completion)
     }
 
-    private func makeSamples(for m: ScaleMeasurement) -> [HKQuantitySample] {
+    /// One quantity's history from Apple Health — every source, not only this
+    /// app — oldest first. Empty when reading wasn't allowed.
+    func history(of identifier: HKQuantityTypeIdentifier, unit: HKUnit,
+                 since start: Date?) async -> [(date: Date, value: Double)] {
+        guard HKHealthStore.isHealthDataAvailable() else { return [] }
+        let predicate = start.map { HKQuery.predicateForSamples(withStart: $0, end: nil) }
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [.quantitySample(type: HKQuantityType(identifier), predicate: predicate)],
+            sortDescriptors: [SortDescriptor(\.startDate)])
+        let samples = (try? await descriptor.result(for: store)) ?? []
+        return samples.map { ($0.startDate, $0.quantity.doubleValue(for: unit)) }
+    }
+
+    private func makeSamples(for m: ScaleMeasurement, version: Int) -> [HKQuantitySample] {
         let t = types
         var result: [HKQuantitySample] = []
 
         func meta(_ suffix: String) -> [String: Any] {
             [HKMetadataKeySyncIdentifier: "scalesync-\(m.key)-\(suffix)",
-             HKMetadataKeySyncVersion: 1]
+             HKMetadataKeySyncVersion: version]
         }
 
         let kg = HKUnit.gramUnit(with: .kilo)

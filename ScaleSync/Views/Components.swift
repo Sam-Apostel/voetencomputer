@@ -67,7 +67,7 @@ struct DonutSegmentShape: Shape {
 /// Segmented donut for parts-of-a-whole data (fractions should sum to ≤ 1).
 /// Flat-edged segments with slightly rounded corners, the percentage painted
 /// on each segment (rotated so the text bottom faces the center), and an icon
-/// placed radially outside each segment.
+/// with the segment's name placed radially outside it.
 struct BodyCompositionDonut: View {
     struct Segment: Identifiable {
         let label: String
@@ -81,7 +81,7 @@ struct BodyCompositionDonut: View {
 
     private let thickness: CGFloat = 34
     private let gap = 0.014           // half-gap trimmed off each segment edge
-    private let labelSpace: CGFloat = 34   // room around the ring for icons
+    private let labelSpace: CGFloat = 46   // room around the ring for icon + name
     /// Below this fraction the percentage no longer fits on the segment and
     /// moves outside, under the icon.
     private let insideTextMinFraction = 0.09
@@ -104,7 +104,7 @@ struct BodyCompositionDonut: View {
             let side = min(geo.size.width, geo.size.height)
             let ringDiameter = side - labelSpace * 2
             let textRadius = ringDiameter / 2 - thickness / 2
-            let iconRadius = ringDiameter / 2 + 18
+            let iconRadius = ringDiameter / 2 + 28
 
             ZStack {
                 ForEach(segments) { segment in
@@ -136,18 +136,20 @@ struct BodyCompositionDonut: View {
                                     y: -textRadius * cos(midAngle))
                     }
 
-                    // Icon radially outside the segment.
+                    // Icon and name radially outside the segment. The name is
+                    // what carries the meaning: no symbol says "fat" or "bone".
                     VStack(spacing: 1) {
                         Image(systemName: segment.icon)
                             .font(.footnote)
-                            .foregroundStyle(segment.color)
+                        Text(segment.label)
+                            .font(.caption2.weight(.semibold))
                         if segment.fraction < insideTextMinFraction {
                             Text(percentText(segment))
                                 .font(.caption2.weight(.bold))
                                 .monospacedDigit()
-                                .foregroundStyle(segment.color)
                         }
                     }
+                    .foregroundStyle(segment.color)
                     .fixedSize()
                     .offset(x: iconRadius * sin(midAngle),
                             y: -iconRadius * cos(midAngle))

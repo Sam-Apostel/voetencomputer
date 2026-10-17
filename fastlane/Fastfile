@@ -1,0 +1,61 @@
+# Lanes run from the repository root:
+#   bundle exec fastlane beta   — archive, sign and upload to TestFlight
+#
+# `beta` needs an App Store Connect API key:
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH (path to the AuthKey_XXXX.p8 file)
+
+default_platform(:ios)
+
+PROJECT = "ScaleSync.xcodeproj"
+SCHEME  = "ScaleSync"
+APP_ID  = "land.sams.ScaleSync"
+
+platform :ios do
+  desc "Build, sign and upload a new build to TestFlight"
+  lane :beta do
+    key_path = File.expand_path(ENV.fetch("ASC_KEY_PATH"))
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_filepath: key_path
+    )
+
+    build_number = (latest_testflight_build_number(api_key: api_key, initial_build_number: 0) + 1).to_s
+    UI.message("Build number: #{build_number}")
+
+    # The archive is signed automatically (development), authenticated with
+    # the API key so Xcode can register the device-less profile it needs.
+    auth = "-allowProvisioningUpdates " \
+           "-authenticationKeyPath #{key_path} " \
+           "-authenticationKeyID #{ENV.fetch('ASC_KEY_ID')} " \
+           "-authenticationKeyIssuerID #{ENV.fetch('ASC_ISSUER_ID')}"
+
+    # Export with a local Apple Distribution certificate and App Store
+    # profile: with an App Manager key, Xcode would fall back to cloud
+    # signing, which only Admin keys may use.
+    get_certificates(api_key: api_key, development: false, output_path: "build/signing")
+    get_provisioning_profile(api_key: api_key, app_identifier: APP_ID, output_path: "build/signing")
+
+    build_app(
+      project: PROJECT,
+      scheme: SCHEME,
+      configuration: "Release",
+      output_directory: "build",
+      derived_data_path: "build/DerivedData",
+      clean: true,
+      # gym passes xcargs to the export step too, so the auth flags reach
+      # -exportArchive without export_xcargs (repeating them is an error).
+      xcargs: "#{auth} CURRENT_PROJECT_VERSION=#{build_number}",
+      export_options: {
+        method: "app-store",
+        signingStyle: "manual",
+        provisioningProfiles: { APP_ID => lane_context[SharedValues::SIGH_NAME] }
+      }
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
+    )
+  end
+end

@@ -16,23 +16,37 @@ struct SettingsView: View {
     @AppStorage("heightCm") private var heightCm = 0.0
     @AppStorage("scaleEpoch") private var scaleEpochRaw = ScaleTimeEpoch.year2010.rawValue
     @AppStorage(UserProfiles.defaultsKey) private var userNamesJSON = "{}"
+    /// Toggled by shaking the phone (see ScaleSyncApp).
+    @AppStorage("showAdvancedSettings") private var showAdvanced = false
 
     @State private var showImporter = false
     @State private var importMessage: String?
+    @State private var healthMessage: String?
+    @State private var resyncing = false
     @State private var confirmForget = false
     @FocusState private var heightFocused: Bool
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("Apple Health") {
-                    Button(health.authorized ? "Health access granted" : "Grant Health access") {
-                        health.requestAuthorization()
+                Section {
+                    if health.authorized {
+                        Label("Connected to Apple Health", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                    } else {
+                        Button("Allow Apple Health access") {
+                            Task { await health.requestAuthorization() }
+                        }
                     }
-                    .disabled(health.authorized)
-                    Button("Re-sync all measurements to Health") {
-                        health.resyncAll(container: context.container)
+                    Button(resyncing ? "Re-syncing…" : "Re-sync all measurements") { resync() }
+                        .disabled(resyncing)
+                    if let healthMessage {
+                        Text(healthMessage).font(.footnote).foregroundStyle(.secondary)
                     }
+                } header: {
+                    Text("Apple Health")
+                } footer: {
+                    Text("Re-sync writes all of your measurements to Apple Health again, replacing what's there. Use it if entries are missing in Apple Health.")
                 }
 
                 Section {
@@ -41,9 +55,6 @@ struct SettingsView: View {
                         ForEach(1...8, id: \.self) { slot in
                             Text(UserProfiles.displayName(slot: slot, json: userNamesJSON)).tag(slot)
                         }
-                    }
-                    NavigationLink("Profile names") {
-                        ProfileNamesView(userNamesJSON: $userNamesJSON)
                     }
                     HStack {
                         Text("Height (cm)")
@@ -70,38 +81,19 @@ struct SettingsView: View {
                          : "Only measurements from “\(UserProfiles.displayName(slot: myUserSlot, json: userNamesJSON))” are written to Apple Health. Weights display in \(Units.usesImperial ? "pounds" : "kilograms"), following your device's region settings.")
                 }
                 .onChange(of: heightCm) {
-                    // Height affects BMI — re-push so Health gets BMI samples.
+                    // Height affects BMI — re-push so Health gets the new values.
                     health.resyncAll(container: context.container)
                 }
 
                 Section("Scale") {
                     pairedScaleRow
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Scale clock epoch")
-                        HStack(spacing: 12) {
-                            epochCard(.year2010,
-                                      style: .glass2010,
-                                      title: "BS410 · 444 · 650",
-                                      subtitle: "clock counts from 2010")
-                            epochCard(.unix,
-                                      style: .classic1970,
-                                      title: "Other models",
-                                      subtitle: "clock counts from 1970")
-                        }
+                    NavigationLink("Profile names") {
+                        ProfileNamesView(userNamesJSON: $userNamesJSON)
                     }
-                    .padding(.vertical, 4)
                 }
 
-                Section("History") {
-                    Button("Import VitaDock CSV export…") { showImporter = true }
-                    if let msg = importMessage {
-                        Text(msg).font(.footnote).foregroundStyle(.secondary)
-                    }
-                    NavigationLink("Bluetooth debug log") { DebugLogView() }
-                    #if DEBUG
-                    Button("Insert sample data (debug)") { insertSampleData() }
-                    Button("Delete sample data", role: .destructive) { deleteSampleData() }
-                    #endif
+                if showAdvanced {
+                    advancedSection
                 }
             }
             .navigationTitle("Settings")
@@ -134,10 +126,28 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Scale section pieces
+    private func resync() {
+        resyncing = true
+        healthMessage = nil
+        health.resyncAll(container: context.container) { result in
+            resyncing = false
+            switch result {
+            case .saved(let count):
+                healthMessage = "Wrote \(count) measurement\(count == 1 ? "" : "s") to Apple Health."
+            case .nothingToDo:
+                healthMessage = "Nothing to write yet: there are no measurements for your profile."
+            case .failed(let reason):
+                healthMessage = "Couldn't write to Apple Health: \(reason)"
+            case .unavailable:
+                healthMessage = "Apple Health isn't available on this device."
+            }
+        }
+    }
+
+    // MARK: - Scale
 
     private var pairedScaleRow: some View {
-        let paired = scaleManager.scaleName != nil
+        let paired = scaleManager.isPaired
         return HStack(spacing: 14) {
             ScaleGlyph(style: scaleEpochRaw == ScaleTimeEpoch.year2010.rawValue ? .glass2010 : .classic1970,
                        size: 56, dimmed: !paired)
@@ -158,10 +168,10 @@ struct SettingsView: View {
                     }
                 }
             VStack(alignment: .leading, spacing: 2) {
-                Text(scaleManager.scaleName ?? "No scale paired")
+                Text(paired ? "Medisana scale" : "No scale paired")
                     .foregroundStyle(paired ? .primary : .secondary)
                 Text(paired
-                     ? (confirmForget ? "Tap ✕ to forget this scale" : "Tap to forget")
+                     ? (confirmForget ? "Tap ✕ to forget this scale" : "Paired · tap to forget")
                      : "Step on your scale to pair")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -172,6 +182,46 @@ struct SettingsView: View {
         .onTapGesture {
             guard paired else { return }
             withAnimation(.snappy) { confirmForget.toggle() }
+        }
+    }
+
+    // MARK: - Advanced (revealed by shaking)
+
+    private var advancedSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Scale clock epoch")
+                HStack(spacing: 12) {
+                    epochCard(.year2010,
+                              style: .glass2010,
+                              title: "BS410 · 444 · 650",
+                              subtitle: "clock counts from 2010")
+                    epochCard(.unix,
+                              style: .classic1970,
+                              title: "Other models",
+                              subtitle: "clock counts from 1970")
+                }
+            }
+            .padding(.vertical, 4)
+            Button("Import VitaDock CSV export…") { showImporter = true }
+            if let importMessage {
+                Text(importMessage).font(.footnote).foregroundStyle(.secondary)
+            }
+            NavigationLink("Bluetooth debug log") { DebugLogView() }
+            #if DEBUG
+            Button("Insert sample data (debug)") { insertSampleData() }
+            Button("Delete sample data", role: .destructive) { deleteSampleData() }
+            Button("Simulate unrecognised weigh-in (matches sample data)") {
+                scaleManager.simulateUnrecognizedWeighIn(weightKg: 80.5)
+            }
+            Button("Simulate unrecognised weigh-in (unknown person)") {
+                scaleManager.simulateUnrecognizedWeighIn(weightKg: 55.0)
+            }
+            #endif
+        } header: {
+            Text("Advanced")
+        } footer: {
+            Text("Shake your phone to hide this section again.")
         }
     }
 
@@ -264,7 +314,7 @@ struct ProfileNamesView: View {
                     ))
                 }
             } footer: {
-                Text("Names are only used inside this app. The scale itself only knows slot numbers.")
+                Text("Names are only used inside this app. The scale itself only knows profile numbers (P1–P8).")
             }
         }
         .navigationTitle("Profile names")
